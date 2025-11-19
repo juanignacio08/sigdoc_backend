@@ -20,10 +20,10 @@ public class TablaMaestraEntity {
     Long tablaMaestraId;
 
     @Column(name = "codigotabla", length = 3, nullable = false)
-    private String codTabla;
+    private String codigoTabla;
 
     @Column(name = "codigoitem", length = 3, nullable = false)
-    private String codItem;
+    private String codigoItem;
 
     @Column(name = "codigo", length = 6, nullable = false, unique = true)
     private String codigo;
