@@ -6,4 +6,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TablaMaestraRepository extends JpaRepository<TablaMaestraEntity, Long> {
+
+    boolean existsByCodigoAndEliminado(String code, boolean deleted);
+    default boolean existsMasterTable(String code) {
+        return existsByCodigoAndEliminado(code, false);
+    }
+
 }
