@@ -13,6 +13,7 @@ public interface TablaMaestraService {
     List<TablaMaestraResponse> getAllTablesByIsSystem(boolean isSystem);
     List<TablaMaestraResponse> getAllItemsFromTable(String tableCode);
     List<TablaMaestraResponse> getAllActivesItemsFromTable(String tableCode);
+    TablaMaestraResponse desactive(String code);
 
     boolean existsItem(String code);
     TablaMaestraEntity getByCode(String code);

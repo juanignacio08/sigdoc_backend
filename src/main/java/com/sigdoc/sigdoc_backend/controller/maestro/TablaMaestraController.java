@@ -102,4 +102,17 @@ public class TablaMaestraController {
         }
     }
 
+    @PutMapping("/desactive")
+    public ResponseEntity<ResponseDTO<Object>> desactive(@RequestParam(name = "code") String code) {
+        try {
+            TablaMaestraResponse response = tablaMaestraService.desactive(code);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Tabla Maestra desactivada!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en desactive: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
 }
