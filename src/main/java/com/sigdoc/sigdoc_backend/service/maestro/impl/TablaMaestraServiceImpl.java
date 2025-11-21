@@ -66,6 +66,18 @@ public class TablaMaestraServiceImpl implements TablaMaestraService {
     }
 
     @Override
+    public List<TablaMaestraResponse> getAllTablesByIsSystem(boolean isSystem) {
+        String context = "getAllTablesByIsSystem";
+        log.info("Obteniendo todas las tablas registradas en tabla maestra por el filtro de si es sistema o no. [ CONTEXTO : {} ]", context);
+
+        List<TablaMaestraEntity> list = getTablesByIsSystem(isSystem);
+
+        return list.stream()
+                .map(TablaMaestraResponse.toResponse)
+                .toList();
+    }
+
+    @Override
     public boolean existsItem(String code) {
         return tablaMaestraRepository.existsMasterTable(code);
     }
@@ -81,5 +93,10 @@ public class TablaMaestraServiceImpl implements TablaMaestraService {
     @Override
     public List<TablaMaestraEntity> getTablesForMasterTable() {
         return tablaMaestraRepository.getTables();
+    }
+
+    @Override
+    public List<TablaMaestraEntity> getTablesByIsSystem(boolean isSystem) {
+        return tablaMaestraRepository.getTablesByIsSystem(isSystem);
     }
 }

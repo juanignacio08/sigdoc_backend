@@ -10,8 +10,10 @@ public interface TablaMaestraService {
     TablaMaestraResponse save(TablaMaestraRequest request);
     TablaMaestraResponse update(TablaMaestraRequest request);
     List<TablaMaestraResponse> getAllTables();
+    List<TablaMaestraResponse> getAllTablesByIsSystem(boolean isSystem);
 
     boolean existsItem(String code);
     TablaMaestraEntity getByCode(String code);
     List<TablaMaestraEntity> getTablesForMasterTable();
+    List<TablaMaestraEntity> getTablesByIsSystem(boolean isSystem);
 }

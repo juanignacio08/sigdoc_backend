@@ -63,4 +63,17 @@ public class TablaMaestraController {
         }
     }
 
+    @GetMapping("/getTablesByIsSystem")
+    public ResponseEntity<ResponseDTO<Object>> getTablesByIsSystem(@RequestParam(name = "isSystem") boolean isSystem) {
+        try {
+            List<TablaMaestraResponse> response = tablaMaestraService.getAllTablesByIsSystem(isSystem);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Obteniendo todas las tablas!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en getTablesByIsSystem: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
 }
