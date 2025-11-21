@@ -128,4 +128,17 @@ public class TablaMaestraController {
         }
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<ResponseDTO<Object>> delete(@RequestParam(name = "code") String code) {
+        try {
+            TablaMaestraResponse response = tablaMaestraService.delete(code);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Tabla Maestra eliminada!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en delete: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
 }

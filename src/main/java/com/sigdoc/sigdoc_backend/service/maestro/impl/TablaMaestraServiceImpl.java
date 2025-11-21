@@ -142,6 +142,23 @@ public class TablaMaestraServiceImpl implements TablaMaestraService {
     }
 
     @Override
+    @Transactional
+    public TablaMaestraResponse delete(String code) {
+        String context = "deleteMasterTable";
+        log.info("Eliminando una tabla maestra. [ TABLA_MAESTRA : {} | CONTEXTO : {} ]", code, context);
+
+        TablaMaestraEntity entity = getByCode(code);
+
+        entity.setEliminado(true);
+        entity.setActualizadoPor(SecurityUtil.getCurrentUserId());
+        entity.setFechaActualizacion(LocalDateTime.now());
+
+        TablaMaestraEntity saved = tablaMaestraRepository.save(entity);
+
+        return TablaMaestraResponse.toResponse.apply(saved);
+    }
+
+    @Override
     public boolean existsItem(String code) {
         return tablaMaestraRepository.existsMasterTable(code);
     }
