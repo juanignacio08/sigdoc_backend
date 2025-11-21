@@ -4,6 +4,7 @@ import com.sigdoc.sigdoc_backend.entity.maestro.TablaMaestraEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,4 +19,15 @@ public interface TablaMaestraRepository extends JpaRepository<TablaMaestraEntity
     default Optional<TablaMaestraEntity> getByCode(String code) {
         return findByCodigoAndEliminado(code, false);
     }
+
+    List<TablaMaestraEntity> findByCodigoItemAndEliminado(String codeItem, boolean deleted);
+    default List<TablaMaestraEntity> getTables() {
+        return findByCodigoItemAndEliminado("000", false);
+    }
+
+    List<TablaMaestraEntity> findByCodigoItemAndEsSistemaAndEliminado(String codeItem, boolean isSystem, boolean deleted);
+    default List<TablaMaestraEntity> getTablesByIsSystem(boolean isSystem) {
+        return findByCodigoItemAndEsSistemaAndEliminado("000", isSystem, false);
+    }
+
 }
