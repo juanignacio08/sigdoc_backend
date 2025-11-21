@@ -16,10 +16,6 @@ import java.util.function.Function;
 @ToString
 public class TablaMaestraRequest {
 
-    @NotNull(message = "El id es requerido.")
-    @Min(value = 1, message = "El id debe de ser mayor o igual a 1")
-    Long tablaMaestraId;
-
     @NotBlank(message = "El campo codigoTabla es requerido")
     @Size(min = 3, max = 3, message = "El campo codigoTabla debe tener exactamente 3 caracteres")
     private String codigoTabla;
@@ -27,6 +23,9 @@ public class TablaMaestraRequest {
     @NotBlank(message = "El campo codigoItem es requerido")
     @Size(min = 3, max = 3, message = "El campo codigoItem debe tener exactamente 3 caracteres")
     private String codigoItem;
+
+    @Size(min = 6, max = 6, message = "El campo codigo debe tener exactamente 6 caracteres")
+    private String codigo;
 
     private Integer orden;
 

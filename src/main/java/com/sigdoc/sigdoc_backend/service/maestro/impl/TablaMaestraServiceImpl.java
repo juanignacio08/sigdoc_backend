@@ -1,7 +1,9 @@
 package com.sigdoc.sigdoc_backend.service.maestro.impl;
 
 import com.sigdoc.sigdoc_backend.entity.maestro.TablaMaestraEntity;
+import com.sigdoc.sigdoc_backend.exceptions.BadRequestException;
 import com.sigdoc.sigdoc_backend.exceptions.DuplicateKeyErrorException;
+import com.sigdoc.sigdoc_backend.exceptions.NotFoundException;
 import com.sigdoc.sigdoc_backend.expose.request.maestro.TablaMaestraRequest;
 import com.sigdoc.sigdoc_backend.expose.response.maestro.TablaMaestraResponse;
 import com.sigdoc.sigdoc_backend.persistence.repository.maestro.TablaMaestraRepository;
@@ -35,7 +37,30 @@ public class TablaMaestraServiceImpl implements TablaMaestraService {
     }
 
     @Override
+    @Transactional
+    public TablaMaestraResponse update(TablaMaestraRequest request) {
+        String context = "updateMasterTable";
+        log.info("Actualizando un registro de tabla maestra. [ TABLA_MAESTRA : {} | CONTEXTO : {} ]", request.getCodigo(), context);
+
+        TablaMaestraEntity entity = getByCode(request.getCodigo());
+
+        TablaMaestraRequest.toUpdateEntity(request, entity);
+
+        TablaMaestraEntity saved = tablaMaestraRepository.save(entity);
+
+        return TablaMaestraResponse.toResponse.apply(saved);
+    }
+
+    @Override
     public boolean existsItem(String code) {
         return tablaMaestraRepository.existsMasterTable(code);
+    }
+
+    @Override
+    public TablaMaestraEntity getByCode(String code) {
+        if (code == null || code.length() < 6) throw new BadRequestException("Codigo Incorrecto. [ TABLA_MAESTRA ]");
+
+        return tablaMaestraRepository.getByCode(code)
+                .orElseThrow(() -> new NotFoundException("Recurso no encontrado. [ TABLA_MAESTRA ]"));
     }
 }
