@@ -11,9 +11,13 @@ public interface TablaMaestraService {
     TablaMaestraResponse update(TablaMaestraRequest request);
     List<TablaMaestraResponse> getAllTables();
     List<TablaMaestraResponse> getAllTablesByIsSystem(boolean isSystem);
+    List<TablaMaestraResponse> getAllItemsFromTable(String tableCode);
+    List<TablaMaestraResponse> getAllActivesItemsFromTable(String tableCode);
 
     boolean existsItem(String code);
     TablaMaestraEntity getByCode(String code);
     List<TablaMaestraEntity> getTablesForMasterTable();
     List<TablaMaestraEntity> getTablesByIsSystem(boolean isSystem);
+    List<TablaMaestraEntity> getItemsFromTable(String tableCode);
+    List<TablaMaestraEntity> getActivesItemsFromTable(String tableCode);
 }

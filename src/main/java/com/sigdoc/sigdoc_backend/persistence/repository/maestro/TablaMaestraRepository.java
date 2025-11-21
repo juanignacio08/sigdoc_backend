@@ -30,4 +30,14 @@ public interface TablaMaestraRepository extends JpaRepository<TablaMaestraEntity
         return findByCodigoItemAndEsSistemaAndEliminado("000", isSystem, false);
     }
 
+    List<TablaMaestraEntity> findByCodigoTablaAndCodigoItemNotAndEliminado(String tableCode, String itemCode, boolean deleted);
+    default List<TablaMaestraEntity> getAllItemsByTable(String tableCode) {
+        return findByCodigoTablaAndCodigoItemNotAndEliminado(tableCode, "000", false);
+    }
+
+    List<TablaMaestraEntity> findByCodigoTablaAndCodigoItemNotAndEstadoAndEliminado(String tableCode, String itemCode, Integer status, boolean deleted);
+    default List<TablaMaestraEntity> getAllActivesItemsByTable(String tableCode) {
+        return findByCodigoTablaAndCodigoItemNotAndEstadoAndEliminado(tableCode, "000", 1, false);
+    }
+
 }

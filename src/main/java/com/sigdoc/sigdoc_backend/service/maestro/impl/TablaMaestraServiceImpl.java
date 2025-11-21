@@ -78,6 +78,30 @@ public class TablaMaestraServiceImpl implements TablaMaestraService {
     }
 
     @Override
+    public List<TablaMaestraResponse> getAllItemsFromTable(String tableCode) {
+        String context = "getAllItemsFromTable";
+        log.info("Obteniendo los items de una tabla. [ TABLA : {} | CONTEXTO : {} ]", tableCode, context);
+
+        List<TablaMaestraEntity> list = getItemsFromTable(tableCode);
+
+        return list.stream()
+                .map(TablaMaestraResponse.toResponse)
+                .toList();
+    }
+
+    @Override
+    public List<TablaMaestraResponse> getAllActivesItemsFromTable(String tableCode) {
+        String context = "getAllActivesItemsFromTable";
+        log.info("Obteniendo los items activos de una tabla. [ TABLA : {} | CONTEXTO : {} ]", tableCode, context);
+
+        List<TablaMaestraEntity> list = getActivesItemsFromTable(tableCode);
+
+        return list.stream()
+                .map(TablaMaestraResponse.toResponse)
+                .toList();
+    }
+
+    @Override
     public boolean existsItem(String code) {
         return tablaMaestraRepository.existsMasterTable(code);
     }
@@ -98,5 +122,19 @@ public class TablaMaestraServiceImpl implements TablaMaestraService {
     @Override
     public List<TablaMaestraEntity> getTablesByIsSystem(boolean isSystem) {
         return tablaMaestraRepository.getTablesByIsSystem(isSystem);
+    }
+
+    @Override
+    public List<TablaMaestraEntity> getItemsFromTable(String tableCode) {
+        if (tableCode == null || tableCode.length() != 3) throw new BadRequestException("Codigo de Tabla incorrecto. [ TABLA_MAESTRA ]");
+
+        return tablaMaestraRepository.getAllItemsByTable(tableCode);
+    }
+
+    @Override
+    public List<TablaMaestraEntity> getActivesItemsFromTable(String tableCode) {
+        if (tableCode == null || tableCode.length() != 3) throw new BadRequestException("Codigo de Tabla incorrecto. [ TABLA_MAESTRA ]");
+
+        return tablaMaestraRepository.getAllActivesItemsByTable(tableCode);
     }
 }

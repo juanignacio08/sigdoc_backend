@@ -76,4 +76,30 @@ public class TablaMaestraController {
         }
     }
 
+    @GetMapping("/getItemsByTable")
+    public ResponseEntity<ResponseDTO<Object>> getItemsByTable(@RequestParam(name = "tableCode") String tableCode) {
+        try {
+            List<TablaMaestraResponse> response = tablaMaestraService.getAllItemsFromTable(tableCode);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Obteniendo todos los items de una tabla!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en getItemsByTable: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
+    @GetMapping("/getActiveItemsByTable")
+    public ResponseEntity<ResponseDTO<Object>> getActiveItemsByTable(@RequestParam(name = "tableCode") String tableCode) {
+        try {
+            List<TablaMaestraResponse> response = tablaMaestraService.getAllActivesItemsFromTable(tableCode);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Obteniendo todos los items activos de una tabla!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en getActiveItemsByTable: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
 }
