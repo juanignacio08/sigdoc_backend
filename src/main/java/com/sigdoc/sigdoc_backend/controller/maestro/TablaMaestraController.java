@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/master-table")
 @Validated
@@ -44,6 +46,19 @@ public class TablaMaestraController {
 
         } catch (Exception e) {
             log.error("Error en update: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
+    @GetMapping("/getAllTables")
+    public ResponseEntity<ResponseDTO<Object>> getAllTables() {
+        try {
+            List<TablaMaestraResponse> response = tablaMaestraService.getAllTables();
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Obteniendo todas las tablas!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en getAllTables: {} ", e.getMessage());
             throw e;
         }
     }

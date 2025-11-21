@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = @__(@Autowired))
@@ -52,6 +54,18 @@ public class TablaMaestraServiceImpl implements TablaMaestraService {
     }
 
     @Override
+    public List<TablaMaestraResponse> getAllTables() {
+        String context = "getAllTables";
+        log.info("Obteniendo todas las tablas registradas en tabla maestra. [ CONTEXTO : {} ]", context);
+
+        List<TablaMaestraEntity> list = getTablesForMasterTable();
+
+        return list.stream()
+                .map(TablaMaestraResponse.toResponse)
+                .toList();
+    }
+
+    @Override
     public boolean existsItem(String code) {
         return tablaMaestraRepository.existsMasterTable(code);
     }
@@ -62,5 +76,10 @@ public class TablaMaestraServiceImpl implements TablaMaestraService {
 
         return tablaMaestraRepository.getByCode(code)
                 .orElseThrow(() -> new NotFoundException("Recurso no encontrado. [ TABLA_MAESTRA ]"));
+    }
+
+    @Override
+    public List<TablaMaestraEntity> getTablesForMasterTable() {
+        return tablaMaestraRepository.getTables();
     }
 }
