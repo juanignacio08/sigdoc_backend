@@ -14,6 +14,7 @@ public interface TablaMaestraService {
     List<TablaMaestraResponse> getAllItemsFromTable(String tableCode);
     List<TablaMaestraResponse> getAllActivesItemsFromTable(String tableCode);
     TablaMaestraResponse desactive(String code);
+    TablaMaestraResponse active(String code);
 
     boolean existsItem(String code);
     TablaMaestraEntity getByCode(String code);

@@ -115,4 +115,17 @@ public class TablaMaestraController {
         }
     }
 
+    @PutMapping("/active")
+    public ResponseEntity<ResponseDTO<Object>> active(@RequestParam(name = "code") String code) {
+        try {
+            TablaMaestraResponse response = tablaMaestraService.active(code);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Tabla Maestra activada!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en active: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
 }

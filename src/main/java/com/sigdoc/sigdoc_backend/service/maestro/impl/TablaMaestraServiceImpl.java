@@ -123,6 +123,25 @@ public class TablaMaestraServiceImpl implements TablaMaestraService {
     }
 
     @Override
+    @Transactional
+    public TablaMaestraResponse active(String code) {
+        String context = "activeMasterTable";
+        log.info("Activando un registro de tabla maestra. [ TABLA_MAESTRA : {} | CONTEXTO : {} ]", code, context);
+
+        TablaMaestraEntity entity = getByCode(code);
+
+        if (entity.getEstado().equals(1)) return TablaMaestraResponse.toResponse.apply(entity);
+
+        entity.setEstado(1);
+        entity.setActualizadoPor(SecurityUtil.getCurrentUserId());
+        entity.setFechaActualizacion(LocalDateTime.now());
+
+        TablaMaestraEntity saved = tablaMaestraRepository.save(entity);
+
+        return TablaMaestraResponse.toResponse.apply(saved);
+    }
+
+    @Override
     public boolean existsItem(String code) {
         return tablaMaestraRepository.existsMasterTable(code);
     }
