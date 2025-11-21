@@ -11,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/master-table")
@@ -34,6 +31,19 @@ public class TablaMaestraController {
 
         } catch (Exception e) {
             log.error("Error en save: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ResponseDTO<Object>> update(@RequestBody @Valid TablaMaestraRequest request) {
+        try {
+            TablaMaestraResponse response = tablaMaestraService.update(request);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Tabla Maestra actualizada!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en update: {} ", e.getMessage());
             throw e;
         }
     }
