@@ -6,6 +6,7 @@ import com.sigdoc.sigdoc_backend.exceptions.DuplicateKeyErrorException;
 import com.sigdoc.sigdoc_backend.exceptions.NotFoundException;
 import com.sigdoc.sigdoc_backend.expose.request.maestro.TablaMaestraRequest;
 import com.sigdoc.sigdoc_backend.expose.response.maestro.TablaMaestraResponse;
+import com.sigdoc.sigdoc_backend.expose.util.SecurityUtil;
 import com.sigdoc.sigdoc_backend.persistence.repository.maestro.TablaMaestraRepository;
 import com.sigdoc.sigdoc_backend.service.maestro.TablaMaestraService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -99,6 +101,61 @@ public class TablaMaestraServiceImpl implements TablaMaestraService {
         return list.stream()
                 .map(TablaMaestraResponse.toResponse)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public TablaMaestraResponse desactive(String code) {
+        String context = "desactiveMasterTable";
+        log.info("Desactivando un registro de tabla maestra. [ TABLA_MAESTRA : {} | CONTEXTO : {} ]", code, context);
+
+        TablaMaestraEntity entity = getByCode(code);
+
+        if (entity.getEstado().equals(0)) return TablaMaestraResponse.toResponse.apply(entity);
+
+        entity.setEstado(0);
+        entity.setActualizadoPor(SecurityUtil.getCurrentUserId());
+        entity.setFechaActualizacion(LocalDateTime.now());
+
+        TablaMaestraEntity saved = tablaMaestraRepository.save(entity);
+
+        return TablaMaestraResponse.toResponse.apply(saved);
+    }
+
+    @Override
+    @Transactional
+    public TablaMaestraResponse active(String code) {
+        String context = "activeMasterTable";
+        log.info("Activando un registro de tabla maestra. [ TABLA_MAESTRA : {} | CONTEXTO : {} ]", code, context);
+
+        TablaMaestraEntity entity = getByCode(code);
+
+        if (entity.getEstado().equals(1)) return TablaMaestraResponse.toResponse.apply(entity);
+
+        entity.setEstado(1);
+        entity.setActualizadoPor(SecurityUtil.getCurrentUserId());
+        entity.setFechaActualizacion(LocalDateTime.now());
+
+        TablaMaestraEntity saved = tablaMaestraRepository.save(entity);
+
+        return TablaMaestraResponse.toResponse.apply(saved);
+    }
+
+    @Override
+    @Transactional
+    public TablaMaestraResponse delete(String code) {
+        String context = "deleteMasterTable";
+        log.info("Eliminando una tabla maestra. [ TABLA_MAESTRA : {} | CONTEXTO : {} ]", code, context);
+
+        TablaMaestraEntity entity = getByCode(code);
+
+        entity.setEliminado(true);
+        entity.setActualizadoPor(SecurityUtil.getCurrentUserId());
+        entity.setFechaActualizacion(LocalDateTime.now());
+
+        TablaMaestraEntity saved = tablaMaestraRepository.save(entity);
+
+        return TablaMaestraResponse.toResponse.apply(saved);
     }
 
     @Override

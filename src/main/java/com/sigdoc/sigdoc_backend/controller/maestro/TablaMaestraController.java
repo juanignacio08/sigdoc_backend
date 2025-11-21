@@ -102,4 +102,43 @@ public class TablaMaestraController {
         }
     }
 
+    @PutMapping("/desactive")
+    public ResponseEntity<ResponseDTO<Object>> desactive(@RequestParam(name = "code") String code) {
+        try {
+            TablaMaestraResponse response = tablaMaestraService.desactive(code);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Tabla Maestra desactivada!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en desactive: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
+    @PutMapping("/active")
+    public ResponseEntity<ResponseDTO<Object>> active(@RequestParam(name = "code") String code) {
+        try {
+            TablaMaestraResponse response = tablaMaestraService.active(code);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Tabla Maestra activada!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en active: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ResponseDTO<Object>> delete(@RequestParam(name = "code") String code) {
+        try {
+            TablaMaestraResponse response = tablaMaestraService.delete(code);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Tabla Maestra eliminada!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en delete: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
 }
