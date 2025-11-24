@@ -34,6 +34,13 @@ public class UbigeoResponse {
             .estado(entity.getEstado())
             .build();
 
+    public static Function<UbigeoEntity, UbigeoResponse> toResponseProvinces = entity -> UbigeoResponse.builder()
+            .codigoUbigeo(entity.getCodigoUbigeo())
+            .codigoRegion(entity.getCodigoRegion())
+            .codigoProvincia(entity.getCodigoProvincia())
+            .denominacionProvincia(entity.getDenominacion())
+            .estado(entity.getEstado())
+            .build();
 
 
 }

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -33,6 +34,18 @@ public class UbigeoController {
             return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             log.error("Error en getDepartaments: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
+    @GetMapping("/getProvincias")
+    public ResponseEntity<ResponseDTO<Object>> getProvinces(@RequestParam(name = "departamentCode") String departamentCode) {
+        try {
+            List<UbigeoResponse> response = ubigeoService.getProvincias(departamentCode);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Obteniendo todas las provincias de un departamento.");
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            log.error("Error en getProvinces: {} ", e.getMessage());
             throw e;
         }
     }
