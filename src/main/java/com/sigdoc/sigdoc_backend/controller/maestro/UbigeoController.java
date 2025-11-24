@@ -1,7 +1,6 @@
 package com.sigdoc.sigdoc_backend.controller.maestro;
 
 import com.sigdoc.sigdoc_backend.expose.response.base.ResponseDTO;
-import com.sigdoc.sigdoc_backend.expose.response.maestro.TablaMaestraResponse;
 import com.sigdoc.sigdoc_backend.expose.response.maestro.UbigeoResponse;
 import com.sigdoc.sigdoc_backend.expose.util.AppUtil;
 import com.sigdoc.sigdoc_backend.service.maestro.UbigeoService;
@@ -46,6 +45,21 @@ public class UbigeoController {
             return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             log.error("Error en getProvinces: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
+    @GetMapping("/getDistritos")
+    public ResponseEntity<ResponseDTO<Object>> getDistricts(
+            @RequestParam(name = "departamentCode") String departamentCode,
+            @RequestParam(name = "provinceCode") String provinceCode
+    ) {
+        try {
+            List<UbigeoResponse> response = ubigeoService.getDistritos(departamentCode, provinceCode);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Obteniendo todos los distritos de una provincia.");
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            log.error("Error en getDistricts: {} ", e.getMessage());
             throw e;
         }
     }

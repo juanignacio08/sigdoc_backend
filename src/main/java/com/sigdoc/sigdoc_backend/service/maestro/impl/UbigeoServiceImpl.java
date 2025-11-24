@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -45,8 +44,15 @@ public class UbigeoServiceImpl implements UbigeoService {
     }
 
     @Override
-    public List<UbigeoResponse> getDistritos(String codeProvincia) {
-        return List.of();
+    public List<UbigeoResponse> getDistritos(String codeDepartamento, String codeProvincia) {
+        String context = "getProvinces";
+        log.info("Obteniendo Provincias de un departamento. [ DEPARTAMENTO : {} | PROVINCIA : {} | CONTEXTO : {} ]", codeDepartamento, codeProvincia, context);
+
+        if (!ubigeoRepository.existsProvinceByCode(codeDepartamento, codeProvincia)) throw new NotFoundException("Recurso no encontrado. [ PROVINCIA ]");
+
+        List<UbigeoEntity> list = ubigeoRepository.getDistricts(codeDepartamento, codeProvincia);
+
+        return list.stream().map(UbigeoResponse.toResponseDistricts).toList();
     }
 
     @Override

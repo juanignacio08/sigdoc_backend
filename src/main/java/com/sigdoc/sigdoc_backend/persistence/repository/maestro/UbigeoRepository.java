@@ -19,15 +19,26 @@ public interface UbigeoRepository extends JpaRepository<UbigeoEntity, Long> {
     default Optional<UbigeoEntity> getDepartamentByCode(String codeDepartament) {
         return findFirstByCodigoRegionAndCodigoProvinciaAndCodigoDistritoAndEstadoAndEliminado(codeDepartament, "00", "00", 1, false);
     }
+    default Optional<UbigeoEntity> getProvinceByCode(String departamentCode, String provinceCode) {
+        return findFirstByCodigoRegionAndCodigoProvinciaAndCodigoDistritoAndEstadoAndEliminado(departamentCode, provinceCode, "00", 1, false);
+    }
 
     boolean existsByCodigoRegionAndCodigoProvinciaAndCodigoDistritoAndEstadoAndEliminado(String codeDepartament, String codeProvince, String codeDistrict, Integer status, boolean deleted);
     default boolean existsDepartamentByCode(String codeDepartament) {
         return existsByCodigoRegionAndCodigoProvinciaAndCodigoDistritoAndEstadoAndEliminado(codeDepartament, "00", "00", 1, false);
     }
+    default boolean existsProvinceByCode(String departamentCode, String provinceCode) {
+        return existsByCodigoRegionAndCodigoProvinciaAndCodigoDistritoAndEstadoAndEliminado(departamentCode, provinceCode, "00", 1, false);
+    }
 
     List<UbigeoEntity> findByCodigoRegionAndCodigoProvinciaNotAndCodigoDistritoAndEstadoAndEliminadoOrderByDenominacion(String departamentCode, String provinceCode, String districtCode, Integer status, boolean deleted);
     default List<UbigeoEntity> getProvinces(String departamentCode) {
         return findByCodigoRegionAndCodigoProvinciaNotAndCodigoDistritoAndEstadoAndEliminadoOrderByDenominacion(departamentCode, "00", "00", 1, false);
+    }
+
+    List<UbigeoEntity> findByCodigoRegionAndCodigoProvinciaAndCodigoDistritoNotAndEstadoAndEliminadoOrderByDenominacion(String departamentCode, String provinceCode, String districtCode, Integer status, boolean deleted);
+    default List<UbigeoEntity> getDistricts(String departamentCode, String provinceCode) {
+        return findByCodigoRegionAndCodigoProvinciaAndCodigoDistritoNotAndEstadoAndEliminadoOrderByDenominacion(departamentCode, provinceCode, "00", 1, false);
     }
 
 }

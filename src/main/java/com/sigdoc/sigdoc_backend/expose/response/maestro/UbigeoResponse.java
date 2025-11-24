@@ -23,7 +23,7 @@ public class UbigeoResponse {
     private String denominacionProvincia;
 
     private String codigoDistrito;
-    private String denominacionDistrito;;
+    private String denominacionDistrito;
 
     private Integer estado;
 
@@ -39,6 +39,15 @@ public class UbigeoResponse {
             .codigoRegion(entity.getCodigoRegion())
             .codigoProvincia(entity.getCodigoProvincia())
             .denominacionProvincia(entity.getDenominacion())
+            .estado(entity.getEstado())
+            .build();
+
+    public static Function<UbigeoEntity, UbigeoResponse> toResponseDistricts = entity -> UbigeoResponse.builder()
+            .codigoUbigeo(entity.getCodigoUbigeo())
+            .codigoRegion(entity.getCodigoRegion())
+            .codigoProvincia(entity.getCodigoProvincia())
+            .codigoDistrito(entity.getCodigoDistrito())
+            .denominacionDistrito(entity.getDenominacion())
             .estado(entity.getEstado())
             .build();
 
