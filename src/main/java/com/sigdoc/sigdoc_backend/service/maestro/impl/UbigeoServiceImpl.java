@@ -57,7 +57,31 @@ public class UbigeoServiceImpl implements UbigeoService {
 
     @Override
     public UbigeoResponse getUbigeo(String code) {
-        return null;
+        String context = "getUbigeo";
+        log.info("Obteniendo la informacion a detalle de un ubigeo. [ UBIGEO : {} | CONTEXT : {} ]", code, context);
+
+        String departamentCode = code.substring(0, 2);
+        String provinceCode = code.substring(2, 4);
+
+        UbigeoEntity entity = ubigeoRepository.getByCode(code)
+                .orElseThrow(() -> new NotFoundException("Registro no encontrado. [ UBIGEO ]"));
+
+        UbigeoEntity departament = ubigeoRepository.getDepartamentByCode(departamentCode)
+                .orElseThrow(() -> new NotFoundException("Registro no encontrado. [ DEPARTAMENTO ]"));
+
+        UbigeoEntity province = ubigeoRepository.getProvinceByCode(departamentCode, provinceCode)
+                .orElseThrow(() -> new NotFoundException("Registro no encontrado. [ PROVINCIA ]"));
+
+        return UbigeoResponse.builder()
+                .codigoUbigeo(entity.getCodigoUbigeo())
+                .codigoRegion(departament.getCodigoRegion())
+                .denominacionRegion(departament.getDenominacion())
+                .codigoProvincia(province.getCodigoProvincia())
+                .denominacionProvincia(province.getDenominacion())
+                .codigoDistrito(entity.getCodigoDistrito())
+                .denominacionDistrito(entity.getDenominacion())
+                .estado(entity.getEstado())
+                .build();
     }
 
 }

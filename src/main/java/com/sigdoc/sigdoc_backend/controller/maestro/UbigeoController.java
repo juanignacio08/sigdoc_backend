@@ -64,4 +64,18 @@ public class UbigeoController {
         }
     }
 
+    @GetMapping("/getDetail")
+    public ResponseEntity<ResponseDTO<Object>> getDetail(
+            @RequestParam(name = "code") String code
+    ) {
+        try {
+            UbigeoResponse response = ubigeoService.getUbigeo(code);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Obteniendo el ubigeo a detalle.");
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            log.error("Error en getDetail: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
 }

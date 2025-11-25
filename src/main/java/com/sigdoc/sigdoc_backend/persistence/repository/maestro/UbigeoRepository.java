@@ -23,6 +23,11 @@ public interface UbigeoRepository extends JpaRepository<UbigeoEntity, Long> {
         return findFirstByCodigoRegionAndCodigoProvinciaAndCodigoDistritoAndEstadoAndEliminado(departamentCode, provinceCode, "00", 1, false);
     }
 
+    Optional<UbigeoEntity> findByCodigoUbigeoAndEstadoAndEliminado(String code, Integer status, boolean deleted);
+    default Optional<UbigeoEntity> getByCode(String code) {
+        return findByCodigoUbigeoAndEstadoAndEliminado(code, 1, false);
+    }
+
     boolean existsByCodigoRegionAndCodigoProvinciaAndCodigoDistritoAndEstadoAndEliminado(String codeDepartament, String codeProvince, String codeDistrict, Integer status, boolean deleted);
     default boolean existsDepartamentByCode(String codeDepartament) {
         return existsByCodigoRegionAndCodigoProvinciaAndCodigoDistritoAndEstadoAndEliminado(codeDepartament, "00", "00", 1, false);
