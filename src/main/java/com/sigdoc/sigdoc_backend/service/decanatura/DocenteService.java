@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 
 public interface DocenteService {
     DocenteResponse save(DocenteRequest request);
+    DocenteResponse update(DocenteRequest request);
     Page<DocenteResponse> getAllPaginated(int page, int size);
 
     DocenteEntity getByDocumentNumber(String documentNumber);

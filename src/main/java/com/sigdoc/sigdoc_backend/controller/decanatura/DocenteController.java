@@ -37,6 +37,19 @@ public class DocenteController {
         }
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<ResponseDTO<Object>> update(@RequestBody @Valid DocenteRequest request) {
+        try {
+            DocenteResponse response = docenteService.update(request);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Datos del docente actualizado correctamente!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en update: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
     @GetMapping("/getPage")
     public ResponseEntity<PaginatedResponseDTO> getPage(
             @RequestParam(defaultValue = "0", name = "page") int page,

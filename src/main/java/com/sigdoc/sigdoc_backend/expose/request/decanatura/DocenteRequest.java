@@ -17,10 +17,6 @@ import java.util.function.Function;
 @ToString
 public class DocenteRequest {
 
-    @NotNull(message = "El id es requerido.")
-    @Min(value = 1, message = "El id debe de ser mayor a 1")
-    private Long docenteId;
-
     @NotBlank(message = "El tipo de documento es requerido")
     @Size(min = 6, max = 6, message = "El código de tipo de documento debe tener exactamente 6 caracteres")
     private String codTipoDocumento;

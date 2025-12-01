@@ -62,6 +62,31 @@ public class DocenteServiceImpl implements DocenteService {
     }
 
     @Override
+    @Transactional
+    public DocenteResponse update(DocenteRequest request) {
+        String context = "updateTeacher";
+        log.info("Actualizando los datos de un docente. [ DOCENTE : {} | CONTEXTO : {} ]", request.getNumDocumento(), context);
+
+        DocenteEntity entity = getByDocumentNumber(request.getNumDocumento());
+
+        if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO, request.getCodTipoDocumento())) throw new BadRequestException("El tipo de documento es incorrecto.");
+
+        if (!tablaMaestraCache.existsItem(tablaMaestraCache.GENERO, request.getCodGenero())) throw new BadRequestException("El tipo de genero es incorrecto.");
+
+        if (!tablaMaestraCache.existsItem(tablaMaestraCache.ESTADO_CIVIL, request.getCodEstadoCivil())) throw new BadRequestException("El tipo de estado civil es incorrecto");
+
+        if (!ubigeoCache.existsUbigeo(request.getCodUbigeoActual())) throw new BadRequestException("El ubigeo de residencia actual es incorrecto.");
+
+        if (!ubigeoCache.existsUbigeo(request.getCodUbigeoProcedencia())) throw new BadRequestException("El ubigeo de residencia de procedencia es incorrecto.");
+
+        DocenteRequest.toUpdateEntity(request, entity);
+
+        DocenteEntity updated = docenteRepository.save(entity);
+
+        return DocenteResponse.toResponse.apply(updated);
+    }
+
+    @Override
     public Page<DocenteResponse> getAllPaginated(int page, int size) {
         String context = "getPaginated";
         log.info("Obteniendo docentes. [ CONTEXTO : {} ]", context);
