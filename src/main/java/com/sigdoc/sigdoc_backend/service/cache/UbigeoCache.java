@@ -44,4 +44,8 @@ public class UbigeoCache {
         loadCache();
     }
 
+    public String getUbigeo(String ubigeoCode) {
+        return cacheUbigeo.get(ubigeoCode);
+    }
+
 }
