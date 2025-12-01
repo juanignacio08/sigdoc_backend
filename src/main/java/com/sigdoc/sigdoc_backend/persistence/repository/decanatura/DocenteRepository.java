@@ -1,6 +1,8 @@
 package com.sigdoc.sigdoc_backend.persistence.repository.decanatura;
 
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +16,8 @@ public interface DocenteRepository extends JpaRepository<DocenteEntity, Long> {
         return findByNumDocumentoAndEliminado(documentNumber, false);
     }
 
+    Page<DocenteEntity> findByEliminadoOrderByFechaActualizacionDesc(boolean deleted, Pageable pageable);
+    default Page<DocenteEntity> getAllPaginated(Pageable pageable) {
+        return findByEliminadoOrderByFechaActualizacionDesc(false, pageable);
+    }
 }

@@ -12,6 +12,9 @@ import com.sigdoc.sigdoc_backend.service.decanatura.DocenteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +59,18 @@ public class DocenteServiceImpl implements DocenteService {
 
         return DocenteResponse.toResponse.apply(saved);
 
+    }
+
+    @Override
+    public Page<DocenteResponse> getAllPaginated(int page, int size) {
+        String context = "getPaginated";
+        log.info("Obteniendo docentes. [ CONTEXTO : {} ]", context);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<DocenteEntity> entityPage = docenteRepository.getAllPaginated(pageable);
+
+        return entityPage.map(DocenteResponse.toResponse);
     }
 
     @Override
