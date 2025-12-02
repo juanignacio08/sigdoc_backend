@@ -147,12 +147,12 @@ public class DocenteSpecifications {
             LocalDateTime startDT = start != null ? start.atStartOfDay() : null;
             LocalDateTime endDT = end != null ? end.atTime(LocalTime.MAX) : null;
 
-            if (start != null && end != null) {
-                return cb.between(root.get("fechaCreacion"), start, end);
-            } else if (start != null) {
-                return cb.greaterThanOrEqualTo(root.get("fechaCreacion"), start);
-            } else if (end != null) {
-                return cb.lessThanOrEqualTo(root.get("fechaCreacion"), end);
+            if (startDT != null && endDT != null) {
+                return cb.between(root.get("fechaCreacion"), startDT, endDT);
+            } else if (startDT != null) {
+                return cb.greaterThanOrEqualTo(root.get("fechaCreacion"), startDT);
+            } else if (endDT != null) {
+                return cb.lessThanOrEqualTo(root.get("fechaCreacion"), endDT);
             }
             return null;
         };
