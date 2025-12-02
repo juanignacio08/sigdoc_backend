@@ -46,4 +46,9 @@ public interface UbigeoRepository extends JpaRepository<UbigeoEntity, Long> {
         return findByCodigoRegionAndCodigoProvinciaAndCodigoDistritoNotAndEstadoAndEliminadoOrderByDenominacion(departamentCode, provinceCode, "00", 1, false);
     }
 
+    List<UbigeoEntity> findByEstadoAndEliminadoOrderByCodigoUbigeo(Integer status, boolean deleted);
+    default List<UbigeoEntity> getAll() {
+        return findByEstadoAndEliminadoOrderByCodigoUbigeo(1, false);
+    }
+
 }
