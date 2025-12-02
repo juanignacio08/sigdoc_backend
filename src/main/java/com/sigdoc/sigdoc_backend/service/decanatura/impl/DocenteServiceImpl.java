@@ -6,6 +6,7 @@ import com.sigdoc.sigdoc_backend.exceptions.NotFoundException;
 import com.sigdoc.sigdoc_backend.expose.request.decanatura.DocenteRequest;
 import com.sigdoc.sigdoc_backend.expose.response.decanatura.DocenteResponse;
 import com.sigdoc.sigdoc_backend.expose.util.DateConverterUtil;
+import com.sigdoc.sigdoc_backend.expose.util.SecurityUtil;
 import com.sigdoc.sigdoc_backend.persistence.repository.decanatura.DocenteRepository;
 import com.sigdoc.sigdoc_backend.persistence.specification.DocenteSpecifications;
 import com.sigdoc.sigdoc_backend.service.cache.TablaMaestraCache;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = @__(@Autowired))
@@ -138,6 +140,23 @@ public class DocenteServiceImpl implements DocenteService {
         Page<DocenteEntity> entityPage = docenteRepository.findAll(specification, pageable);
 
         return entityPage.map(DocenteResponse.toResponse);
+    }
+
+    @Override
+    @Transactional
+    public DocenteResponse delete(String documentNumber) {
+        String context = "deleteTeacher";
+        log.info("Eliminando a un docente. [ NUMERO_DOCUMENTO : {} | CONTEXTO : {} ]", documentNumber, context);
+
+        DocenteEntity entity = getByDocumentNumber(documentNumber);
+
+        entity.setEliminado(true);
+        entity.setActualizadoPor(SecurityUtil.getCurrentUserId());
+        entity.setFechaActualizacion(LocalDateTime.now());
+
+        DocenteEntity deleted = docenteRepository.save(entity);
+
+        return DocenteResponse.toResponse.apply(deleted);
     }
 
     @Override

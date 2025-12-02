@@ -115,4 +115,18 @@ public class DocenteController {
             throw e;
         }
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ResponseDTO<Object>> deletee(@RequestParam(name = "documentNumber") String documentNumber) {
+        try {
+            DocenteResponse response = docenteService.delete(documentNumber);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Docente eliminado!");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en delete: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
 }
