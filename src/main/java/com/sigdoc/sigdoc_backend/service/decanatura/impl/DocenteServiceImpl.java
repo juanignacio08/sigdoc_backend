@@ -164,4 +164,5 @@ public class DocenteServiceImpl implements DocenteService {
         return docenteRepository.getByDocumentNumber(documentNumber)
                 .orElseThrow(() -> new NotFoundException("Recurso no encontrado. [ DOCENTE ]"));
     }
+
 }
