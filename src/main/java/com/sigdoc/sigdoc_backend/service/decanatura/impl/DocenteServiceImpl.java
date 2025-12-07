@@ -51,7 +51,7 @@ public class DocenteServiceImpl implements DocenteService {
 
         if (teacher != null) return DocenteResponse.toResponse.apply(teacher);
 
-        if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO, request.getCodTipoDocumento())) throw new BadRequestException("El tipo de documento es incorrecto.");
+        if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO_IDENTIDAD, request.getCodTipoDocumento())) throw new BadRequestException("El tipo de documento es incorrecto.");
 
         if (!tablaMaestraCache.existsItem(tablaMaestraCache.GENERO, request.getCodGenero())) throw new BadRequestException("El tipo de genero es incorrecto.");
 
@@ -162,6 +162,14 @@ public class DocenteServiceImpl implements DocenteService {
     @Override
     public DocenteEntity getByDocumentNumber(String documentNumber) {
         return docenteRepository.getByDocumentNumber(documentNumber)
+                .orElseThrow(() -> new NotFoundException("Recurso no encontrado. [ DOCENTE ]"));
+    }
+
+    @Override
+    public DocenteEntity getById(Long id) {
+        if (id == null || id < 1) throw new BadRequestException("Id Incorrecto. [ DOCENTE ]");
+
+        return docenteRepository.getByID(id)
                 .orElseThrow(() -> new NotFoundException("Recurso no encontrado. [ DOCENTE ]"));
     }
 

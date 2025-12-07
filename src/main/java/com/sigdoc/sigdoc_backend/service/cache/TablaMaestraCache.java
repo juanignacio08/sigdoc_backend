@@ -19,9 +19,11 @@ public class TablaMaestraCache {
 
     private Map<String, Set<String>> cacheMasterTable;
 
-    public final String TIPO_DOCUMENTO = "001";
+    public final String TIPO_DOCUMENTO_IDENTIDAD = "001";
     public final String GENERO = "002";
     public final String ESTADO_CIVIL = "003";
+    public final String GRADO_ACADEMICO = "004";
+    public final String TIPO_DOCUMENTO = "005";
 
     @PostConstruct
     public void loadCache() {

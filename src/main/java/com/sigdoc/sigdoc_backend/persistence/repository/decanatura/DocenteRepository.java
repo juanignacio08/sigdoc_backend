@@ -24,6 +24,11 @@ public interface DocenteRepository extends JpaRepository<DocenteEntity, Long>, J
         return findByEliminadoOrderByFechaActualizacionDesc(false, pageable);
     }
 
+    Optional<DocenteEntity> findByDocenteIdAndEliminado(Long docenteId, boolean deleted);
+    default Optional<DocenteEntity> getByID(Long docenteId) {
+        return findByDocenteIdAndEliminado(docenteId, false);
+    }
+
     @Override
     @NonNull
     Page<DocenteEntity> findAll(

@@ -13,4 +13,5 @@ public interface DocenteService {
     DocenteResponse delete(String documentNumber);
 
     DocenteEntity getByDocumentNumber(String documentNumber);
+    DocenteEntity getById(Long id);
 }
