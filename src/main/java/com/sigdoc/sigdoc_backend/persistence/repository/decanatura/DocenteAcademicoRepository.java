@@ -18,6 +18,12 @@ public interface DocenteAcademicoRepository extends JpaRepository<DocenteAcademi
         return findByDocenteAcademicoIdAndEliminado(id, false);
     }
 
+    @EntityGraph(attributePaths = {"documento", "docente"})
+    Optional<DocenteAcademicoEntity> findByDocenteAcademicoIdAndEliminadoEquals(Long id, boolean deleted);
+    default Optional<DocenteAcademicoEntity> getDetailByID(Long id) {
+        return findByDocenteAcademicoIdAndEliminadoEquals(id, false);
+    }
+
     Page<DocenteAcademicoEntity> findByDocente_DocenteIdAndEliminadoOrderByCodGradoAcademicoDesc(Long docenteId, boolean deleted, Pageable pageable);
     default Page<DocenteAcademicoEntity> getByDocentePaginated(Long docenteId, Pageable pageable) {
         return findByDocente_DocenteIdAndEliminadoOrderByCodGradoAcademicoDesc(docenteId, false, pageable);

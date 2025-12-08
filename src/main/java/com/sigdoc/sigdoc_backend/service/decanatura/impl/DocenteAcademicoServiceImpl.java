@@ -94,9 +94,26 @@ public class DocenteAcademicoServiceImpl implements DocenteAcademicoService {
     }
 
     @Override
+    public DocenteAcademicoResponse getAcademicTeacherDetailById(Long id) {
+        String context = "getAcademicTeacherDetailById";
+        log.info("Obteniendo a detalle un grado academico. [ DOCENTE-ACADEMIC : {} | CONTEXTO : {} ]", id, context);
+
+        DocenteAcademicoEntity docenteAcademico = getDetailById(id);
+
+        return DocenteAcademicoResponse.toResponseDetail.apply(docenteAcademico);
+    }
+
+    @Override
     public DocenteAcademicoEntity getWithDocumentById(Long id) {
         if (id == null || id < 1) throw new BadRequestException("Id Incorrecto. [ DOCENTE-ACADEMICO ]");
 
         return docenteAcademicoRepository.getWithDocumentByID(id).orElseThrow(() -> new NotFoundException("Recurso no encontrado. [ DOCENTE-ACADEMICO ]"));
+    }
+
+    @Override
+    public DocenteAcademicoEntity getDetailById(Long id) {
+        if (id == null || id < 1) throw new BadRequestException("Id Incorrecto. [ DOCENTE-ACADEMICO ]");
+
+        return docenteAcademicoRepository.getDetailByID(id).orElseThrow(() -> new NotFoundException("Recurso no encontrado. [ DOCENTE-ACADEMICO ]"));
     }
 }

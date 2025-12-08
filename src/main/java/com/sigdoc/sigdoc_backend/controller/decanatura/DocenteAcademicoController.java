@@ -4,7 +4,6 @@ import com.sigdoc.sigdoc_backend.expose.request.decanatura.DocenteAcademicoReque
 import com.sigdoc.sigdoc_backend.expose.response.base.PaginatedResponseDTO;
 import com.sigdoc.sigdoc_backend.expose.response.base.ResponseDTO;
 import com.sigdoc.sigdoc_backend.expose.response.decanatura.DocenteAcademicoResponse;
-import com.sigdoc.sigdoc_backend.expose.response.decanatura.DocenteResponse;
 import com.sigdoc.sigdoc_backend.expose.util.AppUtil;
 import com.sigdoc.sigdoc_backend.service.decanatura.DocenteAcademicoService;
 import jakarta.validation.Valid;
@@ -71,6 +70,19 @@ public class DocenteAcademicoController {
 
         } catch (Exception e) {
             log.error("Error en getByTeacherPage: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
+    @GetMapping("/getDetail")
+    public ResponseEntity<ResponseDTO<Object>> getDetail(@RequestParam(name = "id") Long id) {
+        try {
+            DocenteAcademicoResponse response = docenteAcademicoService.getAcademicTeacherDetailById(id);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "Información académica obtenida correctamente.");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en getDetail: {} ", e.getMessage());
             throw e;
         }
     }

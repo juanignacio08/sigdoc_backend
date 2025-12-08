@@ -9,6 +9,8 @@ public interface DocenteAcademicoService {
     DocenteAcademicoResponse save(DocenteAcademicoRequest request);
     DocenteAcademicoResponse update(DocenteAcademicoRequest request);
     Page<DocenteAcademicoResponse> getPaginatedByDocente(int page, int size, String docenteNumberDocument);
+    DocenteAcademicoResponse getAcademicTeacherDetailById(Long id);
 
     DocenteAcademicoEntity getWithDocumentById(Long id);
+    DocenteAcademicoEntity getDetailById(Long id);
 }
