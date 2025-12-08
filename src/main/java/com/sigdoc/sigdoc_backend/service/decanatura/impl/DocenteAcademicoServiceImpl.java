@@ -15,6 +15,9 @@ import com.sigdoc.sigdoc_backend.service.decanatura.DocenteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +61,7 @@ public class DocenteAcademicoServiceImpl implements DocenteAcademicoService {
     }
 
     @Override
+    @Transactional
     public DocenteAcademicoResponse update(DocenteAcademicoRequest request) {
         String context = "updateTeacherAcademic";
         log.info("Actualizando los datos academicos de un docente. [ DOCENTE : {} | DOCENTE-ACADEMICO : {} | CONTEXTO : {} ]", request.getDocenteId(), request.getDocenteAcademicoId(), context);
@@ -73,6 +77,20 @@ public class DocenteAcademicoServiceImpl implements DocenteAcademicoService {
         DocenteAcademicoEntity updated = docenteAcademicoRepository.save(docenteAcademico);
 
         return DocenteAcademicoResponse.toResponse.apply(updated);
+    }
+
+    @Override
+    public Page<DocenteAcademicoResponse> getPaginatedByDocente(int page, int size, String docenteNumberDocument) {
+        String context = "getTeacherAcademicByTeacher";
+        log.info("Obteniendo informacion academica de un docente. [ DOCENTE : {} | CONTEXTO : {} ]", docenteNumberDocument, context);
+
+        DocenteEntity docente = docenteService.getByDocumentNumber(docenteNumberDocument);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<DocenteAcademicoEntity> entityPage = docenteAcademicoRepository.getByDocentePaginated(docente.getDocenteId(), pageable);
+
+        return entityPage.map(DocenteAcademicoResponse.toResponse);
     }
 
     @Override
