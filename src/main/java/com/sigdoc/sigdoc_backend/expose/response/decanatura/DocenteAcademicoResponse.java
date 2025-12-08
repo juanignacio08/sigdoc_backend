@@ -1,10 +1,9 @@
 package com.sigdoc.sigdoc_backend.expose.response.decanatura;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteAcademicoEntity;
 import com.sigdoc.sigdoc_backend.expose.util.DateConverterUtil;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.function.Function;
 
@@ -14,8 +13,7 @@ import java.util.function.Function;
 @NoArgsConstructor
 @Builder
 @ToString
-@DynamicInsert
-@DynamicUpdate
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DocenteAcademicoResponse {
 
     private Long docenteAcademicoId;
@@ -38,9 +36,10 @@ public class DocenteAcademicoResponse {
             .institucionEgreso(entity.getInstitucionEgreso())
             .fechaObtencion(DateConverterUtil.formatLocalDateToDDMMYYYY(entity.getFechaObtencion()))
             .especialidad(entity.getEspecialidad())
-            .documento(DocumentoResponse.builder()
+            .documento(entity.getDocumento() != null ? DocumentoResponse.builder()
                     .documentoId(entity.getDocumento().getDocumentoId())
-                    .build())
+                    .build()
+                    : null)
             .estado(entity.getEstado())
             .build();
 
@@ -52,7 +51,8 @@ public class DocenteAcademicoResponse {
             .institucionEgreso(entity.getInstitucionEgreso())
             .fechaObtencion(DateConverterUtil.formatLocalDateToDDMMYYYY(entity.getFechaObtencion()))
             .especialidad(entity.getEspecialidad())
-            .documento(DocumentoResponse.toResponse.apply(entity.getDocumento()))
+            .documento(entity.getDocumento() != null ?
+                    DocumentoResponse.toResponse.apply(entity.getDocumento()) : null)
             .estado(entity.getEstado())
             .build();
 
