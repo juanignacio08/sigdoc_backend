@@ -6,6 +6,7 @@ import com.sigdoc.sigdoc_backend.expose.response.maestro.UbigeoResponse;
 import com.sigdoc.sigdoc_backend.expose.util.DateConverterUtil;
 import lombok.*;
 
+import java.util.List;
 import java.util.function.Function;
 
 @Getter
@@ -34,6 +35,8 @@ public class DocenteResponse {
     private String fotografia;
     private Integer estado;
 
+    private List<DocenteAcademicoResponse> infoAcademica;
+
     public static final Function<DocenteEntity, DocenteResponse> toResponse = entity -> DocenteResponse.builder()
             .docenteId(entity.getDocenteId())
             .codTipoDocumento(entity.getCodTipoDocumento())
@@ -56,6 +59,31 @@ public class DocenteResponse {
             .telefono(entity.getTelefono())
             .fotografia(entity.getFotografia())
             .estado(entity.getEstado())
+            .build();
+
+    public static final Function<DocenteEntity, DocenteResponse> toResponseDetail = entity -> DocenteResponse.builder()
+            .docenteId(entity.getDocenteId())
+            .codTipoDocumento(entity.getCodTipoDocumento())
+            .numDocumento(entity.getNumDocumento())
+            .nombre(entity.getNombre())
+            .apellidoPaterno(entity.getApellidoPaterno())
+            .apellidoMaterno(entity.getApellidoMaterno())
+            .fechaNacimiento(DateConverterUtil.formatLocalDateToDDMMYYYY(entity.getFechaNacimiento()))
+            .emailPersonal(entity.getEmailPersonal())
+            .emailInstitucional(entity.getEmailInstitucional())
+            .codGenero(entity.getCodGenero())
+            .direccion(entity.getDireccion())
+            .codUbigeoActual(UbigeoResponse.builder()
+                    .codigoUbigeo(entity.getCodigoUbigeoActual())
+                    .build())
+            .codUbigeoProcedencia(UbigeoResponse.builder()
+                    .codigoUbigeo(entity.getCodUbigeoProcedencia())
+                    .build())
+            .codEstadoCivil(entity.getCodEstadoCivil())
+            .telefono(entity.getTelefono())
+            .fotografia(entity.getFotografia())
+            .estado(entity.getEstado())
+            .infoAcademica(entity.getAcademicsInfo().stream().map(DocenteAcademicoResponse.toResponse).toList())
             .build();
 
 }

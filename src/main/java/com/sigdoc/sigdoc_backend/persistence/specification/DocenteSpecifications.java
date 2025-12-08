@@ -1,6 +1,10 @@
 package com.sigdoc.sigdoc_backend.persistence.specification;
 
+import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteAcademicoEntity;
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteEntity;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
@@ -155,6 +159,53 @@ public class DocenteSpecifications {
                 return cb.lessThanOrEqualTo(root.get("fechaCreacion"), endDT);
             }
             return null;
+        };
+    }
+
+    //academicGrade
+    public static Specification<DocenteEntity> byAcademicGrade(String academicGrade) {
+        if (academicGrade == null) return null;
+
+        return (root, query, cb) -> {
+            if (query != null) query.distinct(true);
+            Join<DocenteEntity, DocenteAcademicoEntity> join = root.join("academicsInfo", JoinType.INNER);
+
+            return cb.equal(join.get("codGradoAcademico"), academicGrade);
+        };
+    }
+
+    public static Specification<DocenteEntity> byAcademicFilters(
+            String academicGrade,
+            String professionalTitle,
+            String institute,
+            String specialty
+    ) {
+        if (academicGrade == null && professionalTitle == null && institute == null && specialty == null) return null;
+
+        return (root, query, cb) -> {
+            if (query != null) query.distinct(true);
+
+            Join<DocenteEntity, DocenteAcademicoEntity> join = root.join("academicsInfo", JoinType.INNER);
+
+            Predicate p = cb.conjunction();
+
+            if (academicGrade != null) {
+                p = cb.and(p, cb.equal(join.get("codGradoAcademico"), academicGrade));
+            }
+
+            if (professionalTitle != null) {
+                p = cb.and(p, cb.like(cb.lower(join.get("tituloProfesional")), "%" + professionalTitle.toLowerCase().trim() + "%"));
+            }
+
+            if (institute != null) {
+                p = cb.and(p, cb.like(cb.lower(join.get("institucionEgreso")), "%" + institute.toLowerCase().trim() + "%"));
+            }
+
+            if (specialty != null) {
+                p = cb.and(p, cb.like(cb.lower(join.get("especialidad")), "%" + specialty.toLowerCase().trim() + "%"));
+            }
+
+            return p;
         };
     }
 
