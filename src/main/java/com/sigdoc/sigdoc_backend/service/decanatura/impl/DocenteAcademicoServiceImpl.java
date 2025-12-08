@@ -8,6 +8,7 @@ import com.sigdoc.sigdoc_backend.exceptions.NotFoundException;
 import com.sigdoc.sigdoc_backend.expose.request.decanatura.DocenteAcademicoRequest;
 import com.sigdoc.sigdoc_backend.expose.request.decanatura.DocumentoRequest;
 import com.sigdoc.sigdoc_backend.expose.response.decanatura.DocenteAcademicoResponse;
+import com.sigdoc.sigdoc_backend.expose.util.SecurityUtil;
 import com.sigdoc.sigdoc_backend.persistence.repository.decanatura.DocenteAcademicoRepository;
 import com.sigdoc.sigdoc_backend.service.cache.TablaMaestraCache;
 import com.sigdoc.sigdoc_backend.service.decanatura.DocenteAcademicoService;
@@ -20,6 +21,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = @__(@Autowired))
@@ -101,6 +104,27 @@ public class DocenteAcademicoServiceImpl implements DocenteAcademicoService {
         DocenteAcademicoEntity docenteAcademico = getDetailById(id);
 
         return DocenteAcademicoResponse.toResponseDetail.apply(docenteAcademico);
+    }
+
+    @Override
+    @Transactional
+    public DocenteAcademicoResponse delete(Long id) {
+        String context = "deleteAcademicTeacher";
+        log.info("Eliminando informacion academica de un docente. [ DOCENTE-ACADEMICO : {} | CONTEXTO : {} ]", id, context);
+
+        DocenteAcademicoEntity docenteAcademico = getWithDocumentById(id);
+
+        docenteAcademico.getDocumento().setEliminado(true);
+        docenteAcademico.getDocumento().setActualizadoPor(SecurityUtil.getCurrentUserId());
+        docenteAcademico.getDocumento().setFechaActualizacion(LocalDateTime.now());
+
+        docenteAcademico.setEliminado(true);
+        docenteAcademico.setActualizadoPor(SecurityUtil.getCurrentUserId());
+        docenteAcademico.setFechaActualizacion(LocalDateTime.now());
+
+        DocenteAcademicoEntity deleted = docenteAcademicoRepository.save(docenteAcademico);
+
+        return DocenteAcademicoResponse.toResponse.apply(deleted);
     }
 
     @Override

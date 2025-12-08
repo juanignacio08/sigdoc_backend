@@ -10,6 +10,7 @@ public interface DocenteAcademicoService {
     DocenteAcademicoResponse update(DocenteAcademicoRequest request);
     Page<DocenteAcademicoResponse> getPaginatedByDocente(int page, int size, String docenteNumberDocument);
     DocenteAcademicoResponse getAcademicTeacherDetailById(Long id);
+    DocenteAcademicoResponse delete(Long id);
 
     DocenteAcademicoEntity getWithDocumentById(Long id);
     DocenteAcademicoEntity getDetailById(Long id);

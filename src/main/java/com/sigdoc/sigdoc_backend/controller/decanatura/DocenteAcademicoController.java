@@ -87,4 +87,17 @@ public class DocenteAcademicoController {
         }
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<ResponseDTO<Object>> delete(@RequestParam(name = "id") Long id) {
+        try {
+            DocenteAcademicoResponse response = docenteAcademicoService.delete(id);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "La información académica del docente ha sido eliminada correctamente.");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en delete: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
 }
