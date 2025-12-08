@@ -3,6 +3,7 @@ package com.sigdoc.sigdoc_backend.service.decanatura.impl;
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteEntity;
 import com.sigdoc.sigdoc_backend.exceptions.BadRequestException;
 import com.sigdoc.sigdoc_backend.exceptions.NotFoundException;
+import com.sigdoc.sigdoc_backend.expose.request.decanatura.DocenteFilter;
 import com.sigdoc.sigdoc_backend.expose.request.decanatura.DocenteRequest;
 import com.sigdoc.sigdoc_backend.expose.response.decanatura.DocenteResponse;
 import com.sigdoc.sigdoc_backend.expose.util.DateConverterUtil;
@@ -107,32 +108,33 @@ public class DocenteServiceImpl implements DocenteService {
     }
 
     @Override
-    public Page<DocenteResponse> getByFilters(int page, int size, String typeDocument, String documentNumber, String name, String lastName1, String lastName2, String dateFirst, String dateEnd, String personalEmail, String institutionalEmail, String gender, String ubigeoActual, Integer nivelActual, String ubigeoProcedencia, Integer nivelProcedencia, String maritalStatus, Integer status, String dateCreationStart, String dateCreationEnd) {
+    public Page<DocenteResponse> getByFilters(int page, int size, DocenteFilter filter) {
         String context = "getByFilters";
         log.info("Realizando busquedas mediante filtros. [ CONTEXTO : {} ]", context);
 
-        LocalDate startDateBirthdate = dateFirst == null ? null : DateConverterUtil.parseFechaDDMMYYYY(dateFirst);
-        LocalDate endDateBirthdate = dateEnd == null ? null : DateConverterUtil.parseFechaDDMMYYYY(dateEnd);
+        LocalDate startDateBirthdate = filter.birthdateStart() == null ? null : DateConverterUtil.parseFechaDDMMYYYY(filter.birthdateStart());
+        LocalDate endDateBirthdate = filter.birthdateEnd() == null ? null : DateConverterUtil.parseFechaDDMMYYYY(filter.birthdateEnd());
 
-        LocalDate startDateCreation = dateCreationStart == null ? null : DateConverterUtil.parseFechaDDMMYYYY(dateCreationStart);
-        LocalDate endDateCreation = dateCreationEnd == null ? null : DateConverterUtil.parseFechaDDMMYYYY(dateCreationEnd);
+        LocalDate startDateCreation = filter.dateCreationStart() == null ? null : DateConverterUtil.parseFechaDDMMYYYY(filter.dateCreationStart());
+        LocalDate endDateCreation = filter.dateCreationEnd() == null ? null : DateConverterUtil.parseFechaDDMMYYYY(filter.dateCreationEnd());
 
         Specification<DocenteEntity> specification = Specification.allOf(
                 DocenteSpecifications.notRemoved(),
-                DocenteSpecifications.byDocumentType(typeDocument),
-                DocenteSpecifications.byDocumentNumber(documentNumber),
-                DocenteSpecifications.byName(name),
-                DocenteSpecifications.byLastName1(lastName1),
-                DocenteSpecifications.byLastName2(lastName2),
+                DocenteSpecifications.byDocumentType(filter.typeDocument()),
+                DocenteSpecifications.byDocumentNumber(filter.documentNumber()),
+                DocenteSpecifications.byName(filter.name()),
+                DocenteSpecifications.byLastName1(filter.lastName1()),
+                DocenteSpecifications.byLastName2(filter.lastName2()),
                 DocenteSpecifications.byBirthdateBetween(startDateBirthdate, endDateBirthdate),
-                DocenteSpecifications.byPersonalEmail(personalEmail),
-                DocenteSpecifications.byInstitutionalEmail(institutionalEmail),
-                DocenteSpecifications.byGender(gender),
-                DocenteSpecifications.byUbigeoActual(ubigeoActual, nivelActual),
-                DocenteSpecifications.byUbigeoProcedencia(ubigeoProcedencia, nivelProcedencia),
-                DocenteSpecifications.byMaritalStatus(maritalStatus),
-                DocenteSpecifications.status(status),
-                DocenteSpecifications.byCreationDateBetween(startDateCreation, endDateCreation)
+                DocenteSpecifications.byPersonalEmail(filter.personalEmail()),
+                DocenteSpecifications.byInstitutionalEmail(filter.institutionalEmail()),
+                DocenteSpecifications.byGender(filter.gender()),
+                DocenteSpecifications.byUbigeoActual(filter.ubigeoActual(), filter.nivelActual()),
+                DocenteSpecifications.byUbigeoProcedencia(filter.ubigeoProcedencia(), filter.nivelProcedencia()),
+                DocenteSpecifications.byMaritalStatus(filter.maritalStatus()),
+                DocenteSpecifications.status(filter.status()),
+                DocenteSpecifications.byCreationDateBetween(startDateCreation, endDateCreation),
+                DocenteSpecifications.byAcademicFilters(filter.academicGrade(), filter.professionalTitle(), filter.academicInstitute(), filter.academicSpecialty())
         );
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("fechaActualizacion").descending());
@@ -157,6 +159,13 @@ public class DocenteServiceImpl implements DocenteService {
         DocenteEntity deleted = docenteRepository.save(entity);
 
         return DocenteResponse.toResponse.apply(deleted);
+    }
+
+    @Override
+    public DocenteResponse getDetail(String documentNumber) {
+        DocenteEntity docente = docenteRepository.getDetailByID(documentNumber).orElseThrow(() -> new NotFoundException("No encontrado"));
+
+        return DocenteResponse.toResponseDetail.apply(docente);
     }
 
     @Override

@@ -2,9 +2,11 @@ package com.sigdoc.sigdoc_backend.entity.decanatura;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "docente", schema = "decanatura")
@@ -83,4 +85,7 @@ public class DocenteEntity {
     @Column(name = "eliminado", nullable = false)
     private Boolean eliminado = false;
 
+    @OneToMany(mappedBy = "docente", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @SQLRestriction("eliminado = false")
+    private List<DocenteAcademicoEntity> academicsInfo;
 }
