@@ -45,17 +45,17 @@ public class DocenteAcademicoServiceImpl implements DocenteAcademicoService {
 
         if (!tablaMaestraCache.existsItem(tablaMaestraCache.GRADO_ACADEMICO, request.getCodGradoAcademico())) throw new BadRequestException("El grado académico ingresado no es válido. Por favor, verifique e inténtelo de nuevo.");
 
-        if (request.getDocumento() == null) throw new BadRequestException("El documento del docente es obligatorio. Por favor, adjunte el archivo correspondiente.");
-
-        if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO, request.getDocumento().getCodTipoDocumento())) throw new BadRequestException("El tipo de documento seleccionado no es válido. Verifique la opción elegida y vuelva a intentarlo.");
-
         DocenteAcademicoEntity entity = DocenteAcademicoRequest.toEntity.apply(request);
 
-        DocumentoEntity documento = DocumentoRequest.toEntity.apply(request.getDocumento());
-        documento.setDocente(docente);
+        if (request.getDocumento() != null) {
+            if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO, request.getDocumento().getCodTipoDocumento())) throw new BadRequestException("El tipo de documento seleccionado no es válido. Verifique la opción elegida y vuelva a intentarlo.");
+
+            DocumentoEntity documento = DocumentoRequest.toEntity.apply(request.getDocumento());
+            documento.setDocente(docente);
+            entity.setDocumento(documento);
+        }
 
         entity.setDocente(docente);
-        entity.setDocumento(documento);
 
         DocenteAcademicoEntity saved = docenteAcademicoRepository.save(entity);
 
@@ -74,7 +74,14 @@ public class DocenteAcademicoServiceImpl implements DocenteAcademicoService {
         DocenteAcademicoRequest.toUpdateEntity(request, docenteAcademico);
 
         if (request.getDocumento() != null) {
-            DocumentoRequest.toUpdateEntity(request.getDocumento(), docenteAcademico.getDocumento());
+            if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO, request.getDocumento().getCodTipoDocumento())) throw new BadRequestException("El tipo de documento seleccionado no es válido. Verifique la opción elegida y vuelva a intentarlo.");
+
+            if (docenteAcademico.getDocumento() != null) DocumentoRequest.toUpdateEntity(request.getDocumento(), docenteAcademico.getDocumento());
+            else {
+                DocumentoEntity documento = DocumentoRequest.toEntity.apply(request.getDocumento());
+                documento.setDocente(docenteAcademico.getDocente());
+                docenteAcademico.setDocumento(documento);
+            }
         }
 
         DocenteAcademicoEntity updated = docenteAcademicoRepository.save(docenteAcademico);

@@ -44,7 +44,7 @@ public class DocenteAcademicoEntity {
     private String especialidad;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "documentoid", nullable = false)
+    @JoinColumn(name = "documentoid")
     private DocumentoEntity documento;
 
     @Column(name = "estado", nullable = false)
