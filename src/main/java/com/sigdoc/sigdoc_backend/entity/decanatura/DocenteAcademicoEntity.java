@@ -28,13 +28,13 @@ public class DocenteAcademicoEntity {
     @JoinColumn(name = "docenteid", nullable = false)
     private DocenteEntity docente;
 
-    @Column(name = "codgradoacademico", length = 6)
+    @Column(name = "codgradoacademico", length = 6, nullable = false)
     private String codGradoAcademico;
 
-    @Column(name = "tituloprofesional", length = 200)
+    @Column(name = "tituloprofesional", length = 200, nullable = false)
     private String tituloProfesional;
 
-    @Column(name = "institucionegreso", length = 200)
+    @Column(name = "institucionegreso", length = 200, nullable = false)
     private String institucionEgreso;
 
     @Column(name = "fechaobtencion")
@@ -44,7 +44,7 @@ public class DocenteAcademicoEntity {
     private String especialidad;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "documentoid")
+    @JoinColumn(name = "documentoid", nullable = false)
     private DocumentoEntity documento;
 
     @Column(name = "estado", nullable = false)

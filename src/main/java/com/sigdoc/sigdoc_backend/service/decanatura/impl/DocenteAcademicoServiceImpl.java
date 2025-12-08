@@ -4,6 +4,7 @@ import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteAcademicoEntity;
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteEntity;
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocumentoEntity;
 import com.sigdoc.sigdoc_backend.exceptions.BadRequestException;
+import com.sigdoc.sigdoc_backend.exceptions.NotFoundException;
 import com.sigdoc.sigdoc_backend.expose.request.decanatura.DocenteAcademicoRequest;
 import com.sigdoc.sigdoc_backend.expose.request.decanatura.DocumentoRequest;
 import com.sigdoc.sigdoc_backend.expose.response.decanatura.DocenteAcademicoResponse;
@@ -36,14 +37,17 @@ public class DocenteAcademicoServiceImpl implements DocenteAcademicoService {
 
         DocenteEntity docente = docenteService.getById(request.getDocenteId());
 
-        if (!tablaMaestraCache.existsItem(tablaMaestraCache.GRADO_ACADEMICO, request.getCodGradoAcademico())) throw new BadRequestException("El grado academico es incorrecto.");
+        if (!tablaMaestraCache.existsItem(tablaMaestraCache.GRADO_ACADEMICO, request.getCodGradoAcademico())) throw new BadRequestException("El grado académico ingresado no es válido. Por favor, verifique e inténtelo de nuevo.");
 
-        if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO, request.getDocumento().getCodTipoDocumento())) throw new BadRequestException("El tipo de documento es incorrecto.");
+        if (request.getDocumento() == null) throw new BadRequestException("El documento del docente es obligatorio. Por favor, adjunte el archivo correspondiente.");
+
+        if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO, request.getDocumento().getCodTipoDocumento())) throw new BadRequestException("El tipo de documento seleccionado no es válido. Verifique la opción elegida y vuelva a intentarlo.");
 
         DocenteAcademicoEntity entity = DocenteAcademicoRequest.toEntity.apply(request);
 
         DocumentoEntity documento = DocumentoRequest.toEntity.apply(request.getDocumento());
-        
+        documento.setDocente(docente);
+
         entity.setDocente(docente);
         entity.setDocumento(documento);
 
@@ -51,5 +55,30 @@ public class DocenteAcademicoServiceImpl implements DocenteAcademicoService {
 
         return DocenteAcademicoResponse.toResponse.apply(saved);
 
+    }
+
+    @Override
+    public DocenteAcademicoResponse update(DocenteAcademicoRequest request) {
+        String context = "updateTeacherAcademic";
+        log.info("Actualizando los datos academicos de un docente. [ DOCENTE : {} | DOCENTE-ACADEMICO : {} | CONTEXTO : {} ]", request.getDocenteId(), request.getDocenteAcademicoId(), context);
+
+        DocenteAcademicoEntity docenteAcademico = getWithDocumentById(request.getDocenteAcademicoId());
+
+        DocenteAcademicoRequest.toUpdateEntity(request, docenteAcademico);
+
+        if (request.getDocumento() != null) {
+            DocumentoRequest.toUpdateEntity(request.getDocumento(), docenteAcademico.getDocumento());
+        }
+
+        DocenteAcademicoEntity updated = docenteAcademicoRepository.save(docenteAcademico);
+
+        return DocenteAcademicoResponse.toResponse.apply(updated);
+    }
+
+    @Override
+    public DocenteAcademicoEntity getWithDocumentById(Long id) {
+        if (id == null || id < 1) throw new BadRequestException("Id Incorrecto. [ DOCENTE-ACADEMICO ]");
+
+        return docenteAcademicoRepository.getWithDocumentByID(id).orElseThrow(() -> new NotFoundException("Recurso no encontrado. [ DOCENTE-ACADEMICO ]"));
     }
 }

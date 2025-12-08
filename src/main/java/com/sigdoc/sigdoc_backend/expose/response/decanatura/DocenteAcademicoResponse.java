@@ -3,6 +3,8 @@ package com.sigdoc.sigdoc_backend.expose.response.decanatura;
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteAcademicoEntity;
 import com.sigdoc.sigdoc_backend.expose.util.DateConverterUtil;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.function.Function;
 
@@ -12,6 +14,8 @@ import java.util.function.Function;
 @NoArgsConstructor
 @Builder
 @ToString
+@DynamicInsert
+@DynamicUpdate
 public class DocenteAcademicoResponse {
 
     private Long docenteAcademicoId;
