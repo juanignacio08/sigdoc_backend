@@ -71,6 +71,8 @@ public class DocenteAcademicoServiceImpl implements DocenteAcademicoService {
 
         DocenteAcademicoEntity docenteAcademico = getWithDocumentById(request.getDocenteAcademicoId());
 
+        if (!tablaMaestraCache.existsItem(tablaMaestraCache.GRADO_ACADEMICO, request.getCodGradoAcademico())) throw new BadRequestException("El grado académico ingresado no es válido. Por favor, verifique e inténtelo de nuevo.");
+
         DocenteAcademicoRequest.toUpdateEntity(request, docenteAcademico);
 
         if (request.getDocumento() != null) {
@@ -121,9 +123,11 @@ public class DocenteAcademicoServiceImpl implements DocenteAcademicoService {
 
         DocenteAcademicoEntity docenteAcademico = getWithDocumentById(id);
 
-        docenteAcademico.getDocumento().setEliminado(true);
-        docenteAcademico.getDocumento().setActualizadoPor(SecurityUtil.getCurrentUserId());
-        docenteAcademico.getDocumento().setFechaActualizacion(LocalDateTime.now());
+        if (docenteAcademico.getDocumento() != null) {
+            docenteAcademico.getDocumento().setEliminado(true);
+            docenteAcademico.getDocumento().setActualizadoPor(SecurityUtil.getCurrentUserId());
+            docenteAcademico.getDocumento().setFechaActualizacion(LocalDateTime.now());
+        }
 
         docenteAcademico.setEliminado(true);
         docenteAcademico.setActualizadoPor(SecurityUtil.getCurrentUserId());

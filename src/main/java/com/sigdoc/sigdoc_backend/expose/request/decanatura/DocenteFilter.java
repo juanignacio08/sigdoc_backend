@@ -54,5 +54,14 @@ public record DocenteFilter(
 
         String professionalTitle,
         String academicInstitute,
-        String academicSpecialty
+        String academicSpecialty,
+
+        //Filters Language
+        @Size(min = 6, max = 6, message = "El codigo del lenguaje debe de tener 6 caracteres")
+        String language,
+
+        @Size(min = 6, max = 6, message = "El codigo del nivel del lenguaje debe de tener 6 caracteres")
+        String languageLevel,
+
+        String languageInstitute
 ) {}
