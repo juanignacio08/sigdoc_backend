@@ -2,6 +2,7 @@ package com.sigdoc.sigdoc_backend.persistence.specification;
 
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteAcademicoEntity;
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteEntity;
+import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteIdiomaEntity;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -203,6 +204,36 @@ public class DocenteSpecifications {
 
             if (specialty != null) {
                 p = cb.and(p, cb.like(cb.lower(join.get("especialidad")), "%" + specialty.toLowerCase().trim() + "%"));
+            }
+
+            return p;
+        };
+    }
+
+    public static Specification<DocenteEntity> byLanguageFilters(
+            String language,
+            String level,
+            String institute
+    ) {
+        if (language == null && level == null && institute == null) return null;
+
+        return (root, query, cb) -> {
+            if (query != null) query.distinct(true);
+
+            Join<DocenteEntity, DocenteIdiomaEntity> join = root.join("idiomas", JoinType.INNER);
+
+            Predicate p = cb.conjunction();
+
+            if (language != null) {
+                p = cb.and(p, cb.equal(join.get("codIdioma"), language));
+            }
+
+            if (level != null) {
+                p = cb.and(p, cb.equal(join.get("nivel"), level));
+            }
+
+            if (institute != null) {
+                p = cb.and(p, cb.like(cb.lower(join.get("institucionEgreso")), "%" + institute.toLowerCase().trim() + "%"));
             }
 
             return p;

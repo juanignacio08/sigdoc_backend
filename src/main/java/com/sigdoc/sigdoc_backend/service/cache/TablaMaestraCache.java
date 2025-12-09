@@ -24,6 +24,8 @@ public class TablaMaestraCache {
     public final String ESTADO_CIVIL = "003";
     public final String GRADO_ACADEMICO = "004";
     public final String TIPO_DOCUMENTO = "005";
+    public final String IDIOMA = "006";
+    public final String NIVEL_IDIOMA = "007";
 
     @PostConstruct
     public void loadCache() {
