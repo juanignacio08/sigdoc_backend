@@ -96,4 +96,8 @@ public class DocenteEntity {
     @OneToMany(mappedBy = "docente", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @SQLRestriction("eliminado = false")
     private List<ExperienciaProfesionalEntity> experiences;
+
+    @OneToMany(mappedBy = "docente", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @SQLRestriction("eliminado = false")
+    private List<CapacitacionEntity> capacitaciones;
 }
