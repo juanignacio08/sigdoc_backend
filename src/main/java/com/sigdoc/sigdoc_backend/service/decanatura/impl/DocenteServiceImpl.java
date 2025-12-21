@@ -135,7 +135,8 @@ public class DocenteServiceImpl implements DocenteService {
                 DocenteSpecifications.status(filter.status()),
                 DocenteSpecifications.byCreationDateBetween(startDateCreation, endDateCreation),
                 DocenteSpecifications.byAcademicFilters(filter.academicGrade(), filter.professionalTitle(), filter.academicInstitute(), filter.academicSpecialty()),
-                DocenteSpecifications.byLanguageFilters(filter.language(), filter.languageLevel(), filter.languageInstitute())
+                DocenteSpecifications.byLanguageFilters(filter.language(), filter.languageLevel(), filter.languageInstitute()),
+                DocenteSpecifications.byExperienceFilters(filter.company(), filter.cargo())
         );
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("fechaActualizacion").descending());

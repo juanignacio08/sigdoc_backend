@@ -63,5 +63,10 @@ public record DocenteFilter(
         @Size(min = 6, max = 6, message = "El codigo del nivel del lenguaje debe de tener 6 caracteres")
         String languageLevel,
 
-        String languageInstitute
+        String languageInstitute,
+
+        //Filters Experience
+        String company,
+
+        String cargo
 ) {}

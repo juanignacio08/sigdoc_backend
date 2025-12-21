@@ -3,6 +3,7 @@ package com.sigdoc.sigdoc_backend.persistence.specification;
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteAcademicoEntity;
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteEntity;
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteIdiomaEntity;
+import com.sigdoc.sigdoc_backend.entity.decanatura.ExperienciaProfesionalEntity;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -234,6 +235,31 @@ public class DocenteSpecifications {
 
             if (institute != null) {
                 p = cb.and(p, cb.like(cb.lower(join.get("institucionEgreso")), "%" + institute.toLowerCase().trim() + "%"));
+            }
+
+            return p;
+        };
+    }
+
+    public static Specification<DocenteEntity> byExperienceFilters(
+            String company,
+            String cargo
+    ) {
+        if (company == null && cargo == null) return null;
+
+        return (root, query, cb) -> {
+            if (query != null) query.distinct(true);
+
+            Join<DocenteEntity, ExperienciaProfesionalEntity> join = root.join("experiences", JoinType.INNER);
+
+            Predicate p = cb.conjunction();
+
+            if (company != null) {
+                p = cb.and(p, cb.like(cb.lower(join.get("empresa")), "%" + company.toLowerCase().trim() + "%"));
+            }
+
+            if (cargo != null) {
+                p = cb.and(p, cb.like(cb.lower(join.get("cargo")), "%" + cargo.toLowerCase().trim() + "%"));
             }
 
             return p;
