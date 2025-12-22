@@ -26,6 +26,13 @@ public class TablaMaestraCache {
     public final String TIPO_DOCUMENTO = "005";
     public final String IDIOMA = "006";
     public final String NIVEL_IDIOMA = "007";
+    public final String REGIMEN_LABORAL = "008";
+    public final String CATEGORIA_DOCENTE = "009";
+    public final String NIVEL_DOCENTE = "010";
+    public final String TIEMPO_DEDICACION = "011";
+
+    public final String DOCENTE_NOMBRADO = "008001";
+    public final String DOCENTE_CONTRATADO = "008002";
 
     @PostConstruct
     public void loadCache() {
