@@ -3,6 +3,8 @@ package com.sigdoc.sigdoc_backend.expose.request.decanatura;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDate;
+
 public record DocenteFilter(
         @Size(min = 6, max = 6, message = "El codigo del tipo de documento debe de tener 6 caracteres")
         String typeDocument,
@@ -67,6 +69,15 @@ public record DocenteFilter(
 
         //Filters Experience
         String company,
+        String cargo,
 
-        String cargo
+        //Filters Institutional Info
+        Long departmentAcademicId,
+        String institutionalCode,
+        String workRegimeCode,
+        String categoryCode,
+        String levelCode,
+        String dedicationTime,
+        String startDate,
+        String endDate
 ) {}

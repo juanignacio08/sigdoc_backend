@@ -1,0 +1,17 @@
+package com.sigdoc.sigdoc_backend.service.decanatura;
+
+import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteLaboralEntity;
+import com.sigdoc.sigdoc_backend.expose.request.decanatura.DocenteLaboralRequest;
+import com.sigdoc.sigdoc_backend.expose.response.decanatura.DocenteLaboralResponse;
+import org.springframework.data.domain.Page;
+
+public interface DocenteLaboralService {
+    DocenteLaboralResponse save(DocenteLaboralRequest request);
+    DocenteLaboralResponse update(DocenteLaboralRequest request);
+    Page<DocenteLaboralResponse> getPaginatedByDocente(int page, int size, String docenteNumberDocument);
+    DocenteLaboralResponse getWorkTeacherDetailById(Long id);
+    DocenteLaboralResponse delete(Long id);
+
+    DocenteLaboralEntity getWithDocumentById(Long id);
+    DocenteLaboralEntity getDetailById(Long id);
+}

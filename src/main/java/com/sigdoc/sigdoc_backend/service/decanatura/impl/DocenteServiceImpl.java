@@ -118,6 +118,9 @@ public class DocenteServiceImpl implements DocenteService {
         LocalDate startDateCreation = filter.dateCreationStart() == null ? null : DateConverterUtil.parseFechaDDMMYYYY(filter.dateCreationStart());
         LocalDate endDateCreation = filter.dateCreationEnd() == null ? null : DateConverterUtil.parseFechaDDMMYYYY(filter.dateCreationEnd());
 
+        LocalDate startDateInstitutional = filter.startDate() == null ? null : DateConverterUtil.parseFechaDDMMYYYY(filter.startDate());
+        LocalDate endDateInstitutional = filter.endDate() == null ? null : DateConverterUtil.parseFechaDDMMYYYY(filter.endDate());
+
         Specification<DocenteEntity> specification = Specification.allOf(
                 DocenteSpecifications.notRemoved(),
                 DocenteSpecifications.byDocumentType(filter.typeDocument()),
@@ -134,6 +137,7 @@ public class DocenteServiceImpl implements DocenteService {
                 DocenteSpecifications.byMaritalStatus(filter.maritalStatus()),
                 DocenteSpecifications.status(filter.status()),
                 DocenteSpecifications.byCreationDateBetween(startDateCreation, endDateCreation),
+                DocenteSpecifications.byInstitutionalFilters(filter.departmentAcademicId(), filter.institutionalCode(), filter.institutionalEmail(), filter.workRegimeCode(), filter.categoryCode(), filter.levelCode(), filter.dedicationTime(), startDateInstitutional, endDateInstitutional),
                 DocenteSpecifications.byAcademicFilters(filter.academicGrade(), filter.professionalTitle(), filter.academicInstitute(), filter.academicSpecialty()),
                 DocenteSpecifications.byLanguageFilters(filter.language(), filter.languageLevel(), filter.languageInstitute()),
                 DocenteSpecifications.byExperienceFilters(filter.company(), filter.cargo())

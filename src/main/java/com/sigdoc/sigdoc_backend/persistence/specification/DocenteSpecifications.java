@@ -1,9 +1,7 @@
 package com.sigdoc.sigdoc_backend.persistence.specification;
 
-import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteAcademicoEntity;
-import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteEntity;
-import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteIdiomaEntity;
-import com.sigdoc.sigdoc_backend.entity.decanatura.ExperienciaProfesionalEntity;
+import com.sigdoc.sigdoc_backend.entity.decanatura.*;
+import com.sigdoc.sigdoc_backend.entity.maestro.DepartamentoAcademicoEntity;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -164,15 +162,75 @@ public class DocenteSpecifications {
         };
     }
 
-    //academicGrade
-    public static Specification<DocenteEntity> byAcademicGrade(String academicGrade) {
-        if (academicGrade == null) return null;
+    public static Specification<DocenteEntity> byInstitutionalFilters(
+            Long departmentAcademicId,
+            String institutionalCode,
+            String institutionalEmail,
+            String workRegimeCode,
+            String categoryCode,
+            String levelCode,
+            String dedicationTime,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        if (departmentAcademicId == null &&
+                institutionalCode == null &&
+                institutionalEmail == null &&
+                workRegimeCode == null &&
+                categoryCode == null &&
+                levelCode == null &&
+                dedicationTime == null &&
+                startDate == null &&
+                endDate == null
+        ) return null;
 
         return (root, query, cb) -> {
             if (query != null) query.distinct(true);
-            Join<DocenteEntity, DocenteAcademicoEntity> join = root.join("academicsInfo", JoinType.INNER);
 
-            return cb.equal(join.get("codGradoAcademico"), academicGrade);
+            Join<DocenteEntity, DocenteLaboralEntity> join = root.join("institutionalInfo", JoinType.INNER);
+
+            Join<DocenteLaboralEntity, DepartamentoAcademicoEntity> deptJoin =
+                    join.join("departamentoAcademico", JoinType.INNER);
+
+            Predicate p = cb.conjunction();
+
+            if (departmentAcademicId != null) {
+                p = cb.and(p, cb.equal(deptJoin.get("departamentoAcademicoId"), departmentAcademicId));
+            }
+
+            if (institutionalCode != null) {
+                p = cb.and(p, cb.like(cb.lower(join.get("codigoInstitucional")), "%" + institutionalCode.toLowerCase().trim() + "%"));
+            }
+
+            if (institutionalEmail != null) {
+                p = cb.and(p, cb.like(cb.lower(join.get("emailInstitucional")), "%" + institutionalEmail.toLowerCase().trim() + "%"));
+            }
+
+            if (workRegimeCode != null) {
+                p = cb.and(p, cb.equal(join.get("codRegimenLaboral"), workRegimeCode));
+            }
+
+            if (categoryCode != null) {
+                p = cb.and(p, cb.equal(join.get("codCategoriaDocenteNombrado"), categoryCode));
+            }
+
+            if (levelCode != null) {
+                p = cb.and(p, cb.equal(join.get("codNivelDocenteContratado"), levelCode));
+            }
+
+            if (dedicationTime != null) {
+                p = cb.and(p, cb.equal(join.get("codTiempoDedicacion"), dedicationTime));
+            }
+
+            if (startDate != null && endDate != null) {
+                p = cb.and(p, cb.between(join.get("fechaInicio"), startDate, endDate));
+            } else if (startDate != null) {
+                p = cb.and(p, cb.greaterThanOrEqualTo(join.get("fechaInicio"), startDate));
+            } else if (endDate != null) {
+                p = cb.and(p, cb.lessThanOrEqualTo(join.get("fechaInicio"), endDate));
+            }
+
+            return p;
         };
     }
 
