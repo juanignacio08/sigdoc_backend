@@ -2,6 +2,7 @@ package com.sigdoc.sigdoc_backend.expose.response.maestro;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.sigdoc.sigdoc_backend.entity.maestro.TablaMaestraEntity;
+import com.sigdoc.sigdoc_backend.service.cache.TablaMaestraCache;
 import lombok.*;
 
 import java.util.function.Function;
@@ -35,5 +36,18 @@ public class TablaMaestraResponse {
             .esSistema(entity.getEsSistema())
             .estado(entity.getEstado())
             .build();
+
+    public static TablaMaestraResponse buildTablaMaestra(
+            String tableCode,
+            String itemCode,
+            TablaMaestraCache cache
+    ) {
+        if (itemCode == null) return null;
+
+        return TablaMaestraResponse.builder()
+                .codigo(itemCode)
+                .denominacion(cache.getDenominacion(tableCode, itemCode))
+                .build();
+    }
 
 }

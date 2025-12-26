@@ -17,7 +17,7 @@ public class TablaMaestraCache {
 
     private final TablaMaestraRepository tablaMaestraRepository;
 
-    private Map<String, Set<String>> cacheMasterTable;
+    private Map<String, Map<String, String>> cacheMasterTable;
 
     public final String TIPO_DOCUMENTO_IDENTIDAD = "001";
     public final String GENERO = "002";
@@ -43,8 +43,8 @@ public class TablaMaestraCache {
         List<TablaMaestraEntity> registros = tablaMaestraRepository.getAll();
 
         for (TablaMaestraEntity t : registros) {
-            cacheMasterTable.computeIfAbsent(t.getCodigoTabla(), k -> new HashSet<>())
-                    .add(t.getCodigo());
+            cacheMasterTable.computeIfAbsent(t.getCodigoTabla(), k -> new HashMap<>())
+                    .put(t.getCodigo(), t.getDenominacion());
         }
 
         log.info("================ Cache de Tabla Maestra cargado correctamente. ================");
@@ -52,7 +52,13 @@ public class TablaMaestraCache {
 
     public boolean existsItem(String tableCode, String itemCode) {
         return cacheMasterTable.containsKey(tableCode)
-                && cacheMasterTable.get(tableCode).contains(itemCode);
+                && cacheMasterTable.get(tableCode).containsKey(itemCode);
+    }
+
+    public String getDenominacion(String tableCode, String itemCode) {
+        return Optional.ofNullable(cacheMasterTable.get(tableCode))
+                .map(m -> m.get(itemCode))
+                .orElse(null);
     }
 
     public void reload() {

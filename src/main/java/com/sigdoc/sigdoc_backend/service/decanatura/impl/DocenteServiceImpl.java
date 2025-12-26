@@ -104,7 +104,10 @@ public class DocenteServiceImpl implements DocenteService {
 
         Page<DocenteEntity> entityPage = docenteRepository.getAllPaginated(pageable);
 
-        return entityPage.map(DocenteResponse.toResponse);
+        return entityPage.map(
+                entity ->
+                        DocenteResponse.toResponseWithMasterTable(entity, tablaMaestraCache)
+        );
     }
 
     @Override
@@ -147,7 +150,9 @@ public class DocenteServiceImpl implements DocenteService {
 
         Page<DocenteEntity> entityPage = docenteRepository.findAll(specification, pageable);
 
-        return entityPage.map(DocenteResponse.toResponse);
+        return entityPage.map(entity ->
+                DocenteResponse.toResponseWithMasterTable(entity, tablaMaestraCache)
+        );
     }
 
     @Override

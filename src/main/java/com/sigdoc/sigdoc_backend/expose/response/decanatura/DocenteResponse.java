@@ -2,8 +2,10 @@ package com.sigdoc.sigdoc_backend.expose.response.decanatura;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteEntity;
+import com.sigdoc.sigdoc_backend.expose.response.maestro.TablaMaestraResponse;
 import com.sigdoc.sigdoc_backend.expose.response.maestro.UbigeoResponse;
 import com.sigdoc.sigdoc_backend.expose.util.DateConverterUtil;
+import com.sigdoc.sigdoc_backend.service.cache.TablaMaestraCache;
 import lombok.*;
 
 import java.util.List;
@@ -18,7 +20,7 @@ import java.util.function.Function;
 public class DocenteResponse {
 
     private Long docenteId;
-    private String codTipoDocumento;
+    private TablaMaestraResponse codTipoDocumento;
     private String numDocumento;
     private String nombre;
     private String apellidoPaterno;
@@ -26,11 +28,11 @@ public class DocenteResponse {
     private String fechaNacimiento;
     private String emailPersonal;
     private String emailInstitucional;
-    private String codGenero;
+    private TablaMaestraResponse codGenero;
     private String direccion;
     private UbigeoResponse codUbigeoActual;
     private UbigeoResponse codUbigeoProcedencia;
-    private String codEstadoCivil;
+    private TablaMaestraResponse codEstadoCivil;
     private String telefono;
     private String fotografia;
     private Integer estado;
@@ -39,7 +41,11 @@ public class DocenteResponse {
 
     public static final Function<DocenteEntity, DocenteResponse> toResponse = entity -> DocenteResponse.builder()
             .docenteId(entity.getDocenteId())
-            .codTipoDocumento(entity.getCodTipoDocumento())
+            .codTipoDocumento(
+                    TablaMaestraResponse.builder()
+                            .codigo(entity.getCodTipoDocumento())
+                            .build()
+            )
             .numDocumento(entity.getNumDocumento())
             .nombre(entity.getNombre())
             .apellidoPaterno(entity.getApellidoPaterno())
@@ -47,7 +53,11 @@ public class DocenteResponse {
             .fechaNacimiento(DateConverterUtil.formatLocalDateToDDMMYYYY(entity.getFechaNacimiento()))
             .emailPersonal(entity.getEmailPersonal())
             .emailInstitucional(entity.getEmailInstitucional())
-            .codGenero(entity.getCodGenero())
+            .codGenero(
+                    TablaMaestraResponse.builder()
+                            .codigo(entity.getCodGenero())
+                            .build()
+            )
             .direccion(entity.getDireccion())
             .codUbigeoActual(UbigeoResponse.builder()
                     .codigoUbigeo(entity.getCodigoUbigeoActual())
@@ -55,7 +65,11 @@ public class DocenteResponse {
             .codUbigeoProcedencia(UbigeoResponse.builder()
                     .codigoUbigeo(entity.getCodUbigeoProcedencia())
                     .build())
-            .codEstadoCivil(entity.getCodEstadoCivil())
+            .codEstadoCivil(
+                    TablaMaestraResponse.builder()
+                            .codigo(entity.getCodEstadoCivil())
+                            .build()
+            )
             .telefono(entity.getTelefono())
             .fotografia(entity.getFotografia())
             .estado(entity.getEstado())
@@ -63,7 +77,11 @@ public class DocenteResponse {
 
     public static final Function<DocenteEntity, DocenteResponse> toResponseDetail = entity -> DocenteResponse.builder()
             .docenteId(entity.getDocenteId())
-            .codTipoDocumento(entity.getCodTipoDocumento())
+            .codTipoDocumento(
+                    TablaMaestraResponse.builder()
+                            .codigo(entity.getCodTipoDocumento())
+                            .build()
+            )
             .numDocumento(entity.getNumDocumento())
             .nombre(entity.getNombre())
             .apellidoPaterno(entity.getApellidoPaterno())
@@ -71,7 +89,11 @@ public class DocenteResponse {
             .fechaNacimiento(DateConverterUtil.formatLocalDateToDDMMYYYY(entity.getFechaNacimiento()))
             .emailPersonal(entity.getEmailPersonal())
             .emailInstitucional(entity.getEmailInstitucional())
-            .codGenero(entity.getCodGenero())
+            .codGenero(
+                    TablaMaestraResponse.builder()
+                            .codigo(entity.getCodGenero())
+                            .build()
+            )
             .direccion(entity.getDireccion())
             .codUbigeoActual(UbigeoResponse.builder()
                     .codigoUbigeo(entity.getCodigoUbigeoActual())
@@ -79,11 +101,51 @@ public class DocenteResponse {
             .codUbigeoProcedencia(UbigeoResponse.builder()
                     .codigoUbigeo(entity.getCodUbigeoProcedencia())
                     .build())
-            .codEstadoCivil(entity.getCodEstadoCivil())
+            .codEstadoCivil(
+                    TablaMaestraResponse.builder()
+                            .codigo(entity.getCodEstadoCivil())
+                            .build()
+            )
             .telefono(entity.getTelefono())
             .fotografia(entity.getFotografia())
             .estado(entity.getEstado())
             .infoAcademica(entity.getAcademicsInfo().stream().map(DocenteAcademicoResponse.toResponse).toList())
             .build();
+
+    public static DocenteResponse toResponseWithMasterTable(
+            DocenteEntity entity,
+            TablaMaestraCache cache
+    ) {
+        return DocenteResponse.builder()
+                .docenteId(entity.getDocenteId())
+                .codTipoDocumento(TablaMaestraResponse.buildTablaMaestra(
+                        cache.TIPO_DOCUMENTO_IDENTIDAD,
+                        entity.getCodTipoDocumento(),
+                        cache
+                ))
+                .codGenero(TablaMaestraResponse.buildTablaMaestra(
+                        cache.GENERO,
+                        entity.getCodGenero(),
+                        cache
+                ))
+                .codEstadoCivil(TablaMaestraResponse.buildTablaMaestra(
+                        cache.ESTADO_CIVIL,
+                        entity.getCodEstadoCivil(),
+                        cache
+                ))
+                .numDocumento(entity.getNumDocumento())
+                .nombre(entity.getNombre())
+                .apellidoPaterno(entity.getApellidoPaterno())
+                .apellidoMaterno(entity.getApellidoMaterno())
+                .fechaNacimiento(DateConverterUtil.formatLocalDateToDDMMYYYY(entity.getFechaNacimiento()))
+                .emailPersonal(entity.getEmailPersonal())
+                .emailInstitucional(entity.getEmailInstitucional())
+                .direccion(entity.getDireccion())
+                .telefono(entity.getTelefono())
+                .fotografia(entity.getFotografia())
+                .estado(entity.getEstado())
+                .build();
+    }
+
 
 }
