@@ -24,9 +24,38 @@ public interface DocenteAcademicoRepository extends JpaRepository<DocenteAcademi
         return findByDocenteAcademicoIdAndEliminadoEquals(id, false);
     }
 
+    @EntityGraph(attributePaths = {"documento"})
     Page<DocenteAcademicoEntity> findByDocente_DocenteIdAndEliminadoOrderByCodGradoAcademicoDesc(Long docenteId, boolean deleted, Pageable pageable);
     default Page<DocenteAcademicoEntity> getByDocentePaginated(Long docenteId, Pageable pageable) {
         return findByDocente_DocenteIdAndEliminadoOrderByCodGradoAcademicoDesc(docenteId, false, pageable);
     }
+
+    boolean existsByDocente_DocenteIdAndCodGradoAcademicoAndTituloProfesionalIgnoreCaseAndInstitucionEgresoIgnoreCaseAndEliminado(Long teacherId, String academicGradeCode, String profession, String institute, boolean deleted);
+    default boolean verifyExistsAcademicTeacher(Long teacherId, String academicGradeCode, String profession, String insitute) {
+        return existsByDocente_DocenteIdAndCodGradoAcademicoAndTituloProfesionalIgnoreCaseAndInstitucionEgresoIgnoreCaseAndEliminado(teacherId, academicGradeCode, profession, insitute, false);
+    }
+
+    Optional<DocenteAcademicoEntity> findByDocente_DocenteIdAndCodGradoAcademicoAndTituloProfesionalIgnoreCaseAndInstitucionEgresoIgnoreCaseAndEliminado(
+            Long teacherId,
+            String academicGradeCode,
+            String profession,
+            String institute,
+            boolean deleted
+    );
+    default Optional<DocenteAcademicoEntity> getAcademicTeacher(
+            Long teacherId,
+            String academicGradeCode,
+            String profession,
+            String institute
+    ) {
+        return findByDocente_DocenteIdAndCodGradoAcademicoAndTituloProfesionalIgnoreCaseAndInstitucionEgresoIgnoreCaseAndEliminado(
+                teacherId,
+                academicGradeCode,
+                profession,
+                institute,
+                false
+        );
+    }
+
 
 }

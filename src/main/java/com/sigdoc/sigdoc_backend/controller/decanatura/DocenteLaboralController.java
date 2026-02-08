@@ -99,5 +99,43 @@ public class DocenteLaboralController {
             throw e;
         }
     }
+
+    @PutMapping("/enabled")
+    public ResponseEntity<ResponseDTO<Object>> enabled(@RequestParam(name = "id") Long id) {
+        try {
+            DocenteLaboralResponse response = docenteLaboralService.active(id);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "La información laboral del docente ha sido habilitado correctamente.");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en enabled: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
+    @PutMapping("/disabled")
+    public ResponseEntity<ResponseDTO<Object>> disabled(@RequestParam(name = "id") Long id) {
+        try {
+            DocenteLaboralResponse response = docenteLaboralService.desactive(id);
+            ResponseDTO<Object> responseDTO = AppUtil.build(response, "La información laboral del docente ha sido desactivada correctamente.");
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            log.error("Error en disabled: {} ", e.getMessage());
+            throw e;
+        }
+    }
+
+    @GetMapping("/canNewAdd")
+    public ResponseEntity<Boolean> canNewAdd(@RequestParam(name = "teacherId") Long id) {
+        try {
+            boolean response = docenteLaboralService.canNewAdd(id);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("Error en canNewAdd: {} ", e.getMessage());
+            throw e;
+        }
+    }
     
 }

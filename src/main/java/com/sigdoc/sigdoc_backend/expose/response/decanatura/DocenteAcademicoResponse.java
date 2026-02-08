@@ -2,7 +2,9 @@ package com.sigdoc.sigdoc_backend.expose.response.decanatura;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteAcademicoEntity;
+import com.sigdoc.sigdoc_backend.expose.response.maestro.TablaMaestraResponse;
 import com.sigdoc.sigdoc_backend.expose.util.DateConverterUtil;
+import com.sigdoc.sigdoc_backend.service.cache.TablaMaestraCache;
 import lombok.*;
 
 import java.util.function.Function;
@@ -18,7 +20,7 @@ public class DocenteAcademicoResponse {
 
     private Long docenteAcademicoId;
     private DocenteResponse docente;
-    private String codGradoAcademico;
+    private TablaMaestraResponse codGradoAcademico;
     private String tituloProfesional;
     private String institucionEgreso;
     private String fechaObtencion;
@@ -31,7 +33,11 @@ public class DocenteAcademicoResponse {
             .docente(DocenteResponse.builder()
                     .docenteId(entity.getDocente().getDocenteId())
                     .build())
-            .codGradoAcademico(entity.getCodGradoAcademico())
+            .codGradoAcademico(
+                    TablaMaestraResponse.builder()
+                            .codigo(entity.getCodGradoAcademico())
+                            .build()
+            )
             .tituloProfesional(entity.getTituloProfesional())
             .institucionEgreso(entity.getInstitucionEgreso())
             .fechaObtencion(DateConverterUtil.formatLocalDateToDDMMYYYY(entity.getFechaObtencion()))
@@ -46,7 +52,11 @@ public class DocenteAcademicoResponse {
     public static final Function<DocenteAcademicoEntity, DocenteAcademicoResponse> toResponseDetail = entity -> DocenteAcademicoResponse.builder()
             .docenteAcademicoId(entity.getDocenteAcademicoId())
             .docente(DocenteResponse.toResponse.apply(entity.getDocente()))
-            .codGradoAcademico(entity.getCodGradoAcademico())
+            .codGradoAcademico(
+                    TablaMaestraResponse.builder()
+                            .codigo(entity.getCodGradoAcademico())
+                            .build()
+            )
             .tituloProfesional(entity.getTituloProfesional())
             .institucionEgreso(entity.getInstitucionEgreso())
             .fechaObtencion(DateConverterUtil.formatLocalDateToDDMMYYYY(entity.getFechaObtencion()))
@@ -55,5 +65,29 @@ public class DocenteAcademicoResponse {
                     DocumentoResponse.toResponse.apply(entity.getDocumento()) : null)
             .estado(entity.getEstado())
             .build();
+
+    public static DocenteAcademicoResponse toResponseWithMasterTable(
+            DocenteAcademicoEntity entity,
+            TablaMaestraCache cache
+    ) {
+        return DocenteAcademicoResponse.builder()
+                .docenteAcademicoId(entity.getDocenteAcademicoId())
+                .docente(DocenteResponse.builder()
+                        .docenteId(entity.getDocente().getDocenteId())
+                        .build())
+                .codGradoAcademico(TablaMaestraResponse.buildTablaMaestra(
+                        cache.GRADO_ACADEMICO,
+                        entity.getCodGradoAcademico(),
+                        cache
+                ))
+                .tituloProfesional(entity.getTituloProfesional())
+                .institucionEgreso(entity.getInstitucionEgreso())
+                .fechaObtencion(DateConverterUtil.formatLocalDateToDDMMYYYY(entity.getFechaObtencion()))
+                .especialidad(entity.getEspecialidad())
+                .documento(entity.getDocumento() != null ?
+                        DocumentoResponse.toResponse.apply(entity.getDocumento()) : null)
+                .estado(entity.getEstado())
+                .build();
+    }
 
 }

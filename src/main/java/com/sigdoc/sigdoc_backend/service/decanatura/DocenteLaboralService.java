@@ -11,6 +11,9 @@ public interface DocenteLaboralService {
     Page<DocenteLaboralResponse> getPaginatedByDocente(int page, int size, String docenteNumberDocument);
     DocenteLaboralResponse getWorkTeacherDetailById(Long id);
     DocenteLaboralResponse delete(Long id);
+    DocenteLaboralResponse desactive(Long id);
+    DocenteLaboralResponse active(Long id);
+    boolean canNewAdd(Long teacherId);
 
     DocenteLaboralEntity getWithDocumentById(Long id);
     DocenteLaboralEntity getDetailById(Long id);

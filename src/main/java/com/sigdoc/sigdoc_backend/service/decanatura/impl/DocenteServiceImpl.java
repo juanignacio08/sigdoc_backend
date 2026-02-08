@@ -2,6 +2,7 @@ package com.sigdoc.sigdoc_backend.service.decanatura.impl;
 
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteEntity;
 import com.sigdoc.sigdoc_backend.exceptions.BadRequestException;
+import com.sigdoc.sigdoc_backend.exceptions.DuplicateKeyErrorException;
 import com.sigdoc.sigdoc_backend.exceptions.NotFoundException;
 import com.sigdoc.sigdoc_backend.expose.request.decanatura.DocenteFilter;
 import com.sigdoc.sigdoc_backend.expose.request.decanatura.DocenteRequest;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,17 +52,17 @@ public class DocenteServiceImpl implements DocenteService {
             teacher = null;
         }
 
-        if (teacher != null) return DocenteResponse.toResponse.apply(teacher);
+        if (teacher != null) throw new DuplicateKeyErrorException("El docente ya esta registrado");
 
         if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO_IDENTIDAD, request.getCodTipoDocumento())) throw new BadRequestException("El tipo de documento es incorrecto.");
 
-        if (!tablaMaestraCache.existsItem(tablaMaestraCache.GENERO, request.getCodGenero())) throw new BadRequestException("El tipo de genero es incorrecto.");
+        if (StringUtils.hasText(request.getCodGenero()) && !tablaMaestraCache.existsItem(tablaMaestraCache.GENERO, request.getCodGenero())) throw new BadRequestException("El tipo de genero es incorrecto.");
 
-        if (!tablaMaestraCache.existsItem(tablaMaestraCache.ESTADO_CIVIL, request.getCodEstadoCivil())) throw new BadRequestException("El tipo de estado civil es incorrecto");
+        if (StringUtils.hasText(request.getCodEstadoCivil()) && !tablaMaestraCache.existsItem(tablaMaestraCache.ESTADO_CIVIL, request.getCodEstadoCivil())) throw new BadRequestException("El tipo de estado civil es incorrecto");
 
-        if (!ubigeoCache.existsUbigeo(request.getCodUbigeoActual())) throw new BadRequestException("El ubigeo de residencia actual es incorrecto.");
+        if (StringUtils.hasText(request.getCodUbigeoActual()) && !ubigeoCache.existsUbigeo(request.getCodUbigeoActual())) throw new BadRequestException("El ubigeo de residencia actual es incorrecto.");
 
-        if (!ubigeoCache.existsUbigeo(request.getCodUbigeoProcedencia())) throw new BadRequestException("El ubigeo de residencia de procedencia es incorrecto.");
+        if (StringUtils.hasText(request.getCodUbigeoProcedencia()) && !ubigeoCache.existsUbigeo(request.getCodUbigeoProcedencia())) throw new BadRequestException("El ubigeo de residencia de procedencia es incorrecto.");
 
         teacher = DocenteRequest.toEntity.apply(request);
 
@@ -78,15 +80,15 @@ public class DocenteServiceImpl implements DocenteService {
 
         DocenteEntity entity = getByDocumentNumber(request.getNumDocumento());
 
-        if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO, request.getCodTipoDocumento())) throw new BadRequestException("El tipo de documento es incorrecto.");
+        if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO_IDENTIDAD, request.getCodTipoDocumento())) throw new BadRequestException("El tipo de documento es incorrecto.");
 
-        if (!tablaMaestraCache.existsItem(tablaMaestraCache.GENERO, request.getCodGenero())) throw new BadRequestException("El tipo de genero es incorrecto.");
+        if (StringUtils.hasText(request.getCodGenero()) && !tablaMaestraCache.existsItem(tablaMaestraCache.GENERO, request.getCodGenero())) throw new BadRequestException("El tipo de genero es incorrecto.");
 
-        if (!tablaMaestraCache.existsItem(tablaMaestraCache.ESTADO_CIVIL, request.getCodEstadoCivil())) throw new BadRequestException("El tipo de estado civil es incorrecto");
+        if (StringUtils.hasText(request.getCodEstadoCivil()) && !tablaMaestraCache.existsItem(tablaMaestraCache.ESTADO_CIVIL, request.getCodEstadoCivil())) throw new BadRequestException("El tipo de estado civil es incorrecto");
 
-        if (!ubigeoCache.existsUbigeo(request.getCodUbigeoActual())) throw new BadRequestException("El ubigeo de residencia actual es incorrecto.");
+        if (StringUtils.hasText(request.getCodUbigeoActual()) && !ubigeoCache.existsUbigeo(request.getCodUbigeoActual())) throw new BadRequestException("El ubigeo de residencia actual es incorrecto.");
 
-        if (!ubigeoCache.existsUbigeo(request.getCodUbigeoProcedencia())) throw new BadRequestException("El ubigeo de residencia de procedencia es incorrecto.");
+        if (StringUtils.hasText(request.getCodUbigeoProcedencia()) && !ubigeoCache.existsUbigeo(request.getCodUbigeoProcedencia())) throw new BadRequestException("El ubigeo de residencia de procedencia es incorrecto.");
 
         DocenteRequest.toUpdateEntity(request, entity);
 
@@ -174,7 +176,7 @@ public class DocenteServiceImpl implements DocenteService {
 
     @Override
     public DocenteResponse getDetail(String documentNumber) {
-        DocenteEntity docente = docenteRepository.getDetailByID(documentNumber).orElseThrow(() -> new NotFoundException("No encontrado"));
+        DocenteEntity docente = docenteRepository.getDetailByID(documentNumber).orElseThrow(() -> new NotFoundException("No existe el docente"));
 
         return DocenteResponse.toResponseDetail.apply(docente);
     }

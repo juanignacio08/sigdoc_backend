@@ -26,3 +26,7 @@ spring:
     #        org.hibernate.SQL: DEBUG #INFO
     #        org.hibernate.type.descriptor.sql.BasicBinder: INFO #TRACE
     #org.hibernate.orm.jdbc.bind: TRACE
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB

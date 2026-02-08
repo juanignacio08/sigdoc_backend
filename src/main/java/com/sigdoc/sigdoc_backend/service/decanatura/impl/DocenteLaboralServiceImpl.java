@@ -48,6 +48,11 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
 
         DepartamentoAcademicoEntity departamentoAcademico = departamentoAcademicoService.getById(request.getDepartamentoId());
 
+        if (docenteLaboralRepository.existsByDocenteId(request.getDocenteId())) throw new BusinessRuleException("El docente ya cuenta con una información laboral activa.\n" +
+                "Para registrar una nueva, primero debe desactivar la información actual.");
+        if (docenteLaboralRepository.existsByInstitutionalCode(request.getCodigoInstitucional())) throw new BusinessRuleException("El código institucional ya está registrado");
+        if (docenteLaboralRepository.existsByInstitutionalEmail(request.getEmailInstitucional())) throw new BusinessRuleException("El email institucional ya está registrado");
+
         if (!tablaMaestraCache.existsItem(tablaMaestraCache.REGIMEN_LABORAL, request.getCodRegimenLaboral())) throw new BadRequestException("El regimen laboral ingresado no es válido. Por favor, verifique e inténtelo de nuevo.");
         if (request.getCodRegimenLaboral().equals(tablaMaestraCache.DOCENTE_NOMBRADO)) {
             if (request.getCodCategoriaDocenteNombrado() == null) throw new BusinessRuleException("La categoria del docente es requerida");
@@ -73,8 +78,6 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
         entity.setDocente(docente);
         entity.setDepartamentoAcademico(departamentoAcademico);
 
-
-
         DocenteLaboralEntity saved = docenteLaboralRepository.save(entity);
 
         return DocenteLaboralResponse.toResponse.apply(saved);
@@ -88,6 +91,11 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
         log.info("Actualizando los datos laborales de un docente. [ DOCENTE : {} | DOCENTE-LABORAL : {} | CONTEXTO : {} ]", request.getDocenteId(), request.getDocenteLaboralId(), context);
 
         DocenteLaboralEntity entity = getWithDocumentById(request.getDocenteLaboralId());
+
+        if (docenteLaboralRepository.existsByDocenteId(request.getDocenteLaboralId(), request.getDocenteId())) throw new BusinessRuleException("El docente ya cuenta con una información laboral activa.\n" +
+                "Para registrar una nueva, primero debe desactivar la información actual.");
+        if (docenteLaboralRepository.existsByInstitutionalCode(request.getDocenteLaboralId(), request.getCodigoInstitucional())) throw new BusinessRuleException("El código institucional ya está registrado");
+        if (docenteLaboralRepository.existsByInstitutionalEmail(request.getDocenteLaboralId(), request.getEmailInstitucional())) throw new BusinessRuleException("El email institucional ya está registrado");
 
         if (!tablaMaestraCache.existsItem(tablaMaestraCache.REGIMEN_LABORAL, request.getCodRegimenLaboral())) throw new BadRequestException("El regimen laboral ingresado no es válido. Por favor, verifique e inténtelo de nuevo.");
         if (request.getCodRegimenLaboral().equals(tablaMaestraCache.DOCENTE_NOMBRADO)) {
@@ -130,7 +138,9 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
 
         Page<DocenteLaboralEntity> entityPage = docenteLaboralRepository.getByDocentePaginated(docente.getDocenteId(), pageable);
 
-        return entityPage.map(DocenteLaboralResponse.toResponse);
+        return entityPage.map(entity ->
+            DocenteLaboralResponse.toResponseWithMasterTable(entity, tablaMaestraCache)
+        );
     }
 
     @Override
@@ -167,6 +177,45 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
     }
 
     @Override
+    public DocenteLaboralResponse desactive(Long id) {
+        String context = "desactiveWorkTeacher";
+        log.info("Desactivando informacion laboral de un docente. [ DOCENTE-LABORAL : {} | CONTEXTO : {} ]", id, context);
+
+        DocenteLaboralEntity entity = getWithDocumentById(id);
+
+        entity.setEstado(0);
+        entity.setActualizadoPor(SecurityUtil.getCurrentUserId());
+        entity.setFechaActualizacion(LocalDateTime.now());
+
+        DocenteLaboralEntity disabled = docenteLaboralRepository.save(entity);
+
+        return DocenteLaboralResponse.toResponse.apply(disabled);
+    }
+
+    @Override
+    public DocenteLaboralResponse active(Long id) {
+        String context = "activeWorkTeacher";
+        log.info("Habilitando informacion laboral de un docente. [ DOCENTE-LABORAL : {} | CONTEXTO : {} ]", id, context);
+
+        DocenteLaboralEntity entity = getWithDocumentById(id);
+        if (!canNewAdd(entity.getDocente().getDocenteId())) throw new BusinessRuleException("El docente ya cuenta con una información laboral activa.\n" +
+                "Para dar de alta una información, primero debe desactivar todas las informaciónes.");
+
+        entity.setEstado(1);
+        entity.setActualizadoPor(SecurityUtil.getCurrentUserId());
+        entity.setFechaActualizacion(LocalDateTime.now());
+
+        DocenteLaboralEntity enabled = docenteLaboralRepository.save(entity);
+
+        return DocenteLaboralResponse.toResponse.apply(enabled);
+    }
+
+    @Override
+    public boolean canNewAdd(Long teacherId) {
+        return !docenteLaboralRepository.existsByDocenteId(teacherId);
+    }
+
+    @Override
     public DocenteLaboralEntity getWithDocumentById(Long id) {
         if (id == null || id < 1) throw new BadRequestException("Id Incorrecto. [ DOCENTE-LABORAL ]");
 
@@ -181,4 +230,5 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
         return docenteLaboralRepository.getDetailByID(id)
                 .orElseThrow(() -> new NotFoundException("Recurso no encontrado. [ DOCENTE-LABORAL ]"));
     }
+
 }

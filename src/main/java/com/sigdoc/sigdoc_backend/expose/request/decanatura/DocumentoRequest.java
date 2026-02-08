@@ -31,7 +31,6 @@ public class DocumentoRequest {
     @Size(min = 6, max = 6, message = "El código de tipo de documento debe tener exactamente 6 caracteres")
     private String codTipoDocumento;
 
-    @NotBlank(message = "La URL del documento es requerida")
     private String url;
 
     @NotNull(message = "El DocenteId es requerido")
