@@ -105,7 +105,7 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
 
     @Override
     @Transactional
-    public DocenteLaboralResponse update(DocenteLaboralRequest request) {
+    public DocenteLaboralResponse update(DocenteLaboralRequest request, MultipartFile file) {
         String context = "updateWorkTeacher";
         log.info("Actualizando los datos laborales de un docente. [ DOCENTE : {} | DOCENTE-LABORAL : {} | CONTEXTO : {} ]", request.getDocenteId(), request.getDocenteLaboralId(), context);
 
@@ -130,14 +130,42 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
 
         DocenteLaboralRequest.toUpdateEntity(request, entity);
 
-        if (request.getDocumento() != null) {
+        if (request.getDocumento() != null && file != null && !file.isEmpty()) {
             if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO, request.getDocumento().getCodTipoDocumento())) throw new BadRequestException("El tipo de documento seleccionado no es válido. Verifique la opción elegida y vuelva a intentarlo.");
 
-            if (entity.getDocumento() != null) DocumentoRequest.toUpdateEntity(request.getDocumento(), entity.getDocumento());
+            if (file.getSize() > 20 * 1024 * 1024) {
+                throw new BadRequestException("El archivo no debe superar los 20 MB");
+            }
+
+            if (!"application/pdf".equals(file.getContentType())) {
+                throw new BadRequestException("Solo se permiten archivos PDF");
+            }
+
+            if (entity.getDocumento() != null) {
+                String rutaAnterior = entity.getDocumento().getUrl();
+
+                String path = fileStorageService.savePdf(file, request.getDocenteId());
+
+                DocumentoRequest.toUpdateEntity(request.getDocumento(), entity.getDocumento());
+                entity.getDocumento().setUrl(path);
+
+                if (rutaAnterior != null) {
+                    try {
+                        Path pathDelete = Paths.get(rutaAnterior);
+                        Files.deleteIfExists(pathDelete);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e.getMessage());
+                    }
+                }
+            }
             else {
-                DocumentoEntity documento = DocumentoRequest.toEntity.apply(request.getDocumento());
-                documento.setDocente(entity.getDocente());
-                entity.setDocumento(documento);
+                String path = fileStorageService.savePdf(file, request.getDocenteId());
+
+                DocumentoEntity document = DocumentoRequest.toEntity.apply(request.getDocumento());
+                document.setUrl(path);
+                document.setDocente(entity.getDocente());
+
+                entity.setDocumento(document);
             }
         }
 

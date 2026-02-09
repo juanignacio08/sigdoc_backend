@@ -52,10 +52,16 @@ public class DocenteLaboralController {
         }
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<ResponseDTO<Object>> update(@RequestBody @Valid DocenteLaboralRequest request) {
+    @PutMapping(
+            value = "/update",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<ResponseDTO<Object>> update(
+            @RequestPart("data") @Valid DocenteLaboralRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
         try {
-            DocenteLaboralResponse response = docenteLaboralService.update(request);
+            DocenteLaboralResponse response = docenteLaboralService.update(request, file);
             ResponseDTO<Object> responseDTO = AppUtil.build(response, "La información laboral del docente ha sido actualizada correctamente.");
             return ResponseEntity.ok(responseDTO);
 

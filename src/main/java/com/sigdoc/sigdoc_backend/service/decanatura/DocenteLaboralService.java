@@ -10,7 +10,7 @@ import java.nio.file.Path;
 
 public interface DocenteLaboralService {
     DocenteLaboralResponse save(DocenteLaboralRequest request, MultipartFile file);
-    DocenteLaboralResponse update(DocenteLaboralRequest request);
+    DocenteLaboralResponse update(DocenteLaboralRequest request, MultipartFile file);
     Page<DocenteLaboralResponse> getPaginatedByDocente(int page, int size, String docenteNumberDocument);
     DocenteLaboralResponse getWorkTeacherDetailById(Long id);
     DocenteLaboralResponse delete(Long id);
