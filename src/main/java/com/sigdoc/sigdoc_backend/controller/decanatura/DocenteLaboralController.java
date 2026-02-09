@@ -10,10 +10,19 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @RestController
 @RequestMapping("/work-teacher")
@@ -24,10 +33,16 @@ public class DocenteLaboralController {
 
     private final DocenteLaboralService docenteLaboralService;
 
-    @PostMapping("/save")
-    public ResponseEntity<ResponseDTO<Object>> save(@RequestBody @Valid DocenteLaboralRequest request) {
+    @PostMapping(
+            value = "/save",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<ResponseDTO<Object>> save(
+            @RequestPart("data") @Valid DocenteLaboralRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
         try {
-            DocenteLaboralResponse response = docenteLaboralService.save(request);
+            DocenteLaboralResponse response = docenteLaboralService.save(request, file);
             ResponseDTO<Object> responseDTO = AppUtil.build(response, "Información laboral registrada correctamente. Los datos del docente han sido guardados.");
             return ResponseEntity.ok(responseDTO);
 
@@ -136,6 +151,29 @@ public class DocenteLaboralController {
             log.error("Error en canNewAdd: {} ", e.getMessage());
             throw e;
         }
+    }
+
+    @GetMapping("/pdf/{id}")
+    public ResponseEntity<Resource> getPdf(@PathVariable Long id) {
+
+        Path path = docenteLaboralService.getPdfPathById(id);
+
+        if (path == null || !Files.exists(path)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Resource resource;
+        try {
+            resource = new UrlResource(path.toUri());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error al cargar el PDF");
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"documento.pdf\"")
+                // ⬆️ inline = ver | attachment = descargar
+                .body(resource);
     }
     
 }

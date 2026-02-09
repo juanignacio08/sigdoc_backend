@@ -15,6 +15,7 @@ import com.sigdoc.sigdoc_backend.service.cache.TablaMaestraCache;
 import com.sigdoc.sigdoc_backend.service.decanatura.DocenteLaboralService;
 import com.sigdoc.sigdoc_backend.service.decanatura.DocenteService;
 import com.sigdoc.sigdoc_backend.service.maestro.DepartamentoAcademicoService;
+import com.sigdoc.sigdoc_backend.service.util.FileStorageService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -35,12 +41,13 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
 
     private final DocenteService docenteService;
     private final DepartamentoAcademicoService departamentoAcademicoService;
+    private final FileStorageService fileStorageService;
 
     private final TablaMaestraCache tablaMaestraCache;
 
     @Override
     @Transactional
-    public DocenteLaboralResponse save(DocenteLaboralRequest request) {
+    public DocenteLaboralResponse save(DocenteLaboralRequest request, MultipartFile file) {
         String context = "saveWorkTeacher";
         log.info("Registrando datos laborales (institucionales) de un docente. [ CONTEXTO : {} ]", context);
 
@@ -67,16 +74,28 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
 
         DocenteLaboralEntity entity = DocenteLaboralRequest.toEntity.apply(request);
 
-        if (request.getDocumento() != null) {
-            if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO, request.getDocumento().getCodTipoDocumento())) throw new BadRequestException("El tipo de documento seleccionado no es válido. Verifique la opción elegida y vuelva a intentarlo.");
-
-            DocumentoEntity documento = DocumentoRequest.toEntity.apply(request.getDocumento());
-            documento.setDocente(docente);
-            entity.setDocumento(documento);
-        }
-
         entity.setDocente(docente);
         entity.setDepartamentoAcademico(departamentoAcademico);
+
+        if (request.getDocumento() != null && file != null) {
+            if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO, request.getDocumento().getCodTipoDocumento())) throw new BadRequestException("El tipo de documento seleccionado no es válido. Verifique la opción elegida y vuelva a intentarlo.");
+
+            if (file.getSize() > 20 * 1024 * 1024) {
+                throw new BadRequestException("El archivo no debe superar los 20 MB");
+            }
+
+            if (!"application/pdf".equals(file.getContentType())) {
+                throw new BadRequestException("Solo se permiten archivos PDF");
+            }
+
+            String path = fileStorageService.savePdf(file, request.getDocenteId());
+
+            DocumentoEntity document = DocumentoRequest.toEntity.apply(request.getDocumento());
+            document.setUrl(path);
+            document.setDocente(docente);
+
+            entity.setDocumento(document);
+        }
 
         DocenteLaboralEntity saved = docenteLaboralRepository.save(entity);
 
@@ -165,6 +184,16 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
             entity.getDocumento().setEliminado(true);
             entity.getDocumento().setActualizadoPor(SecurityUtil.getCurrentUserId());
             entity.getDocumento().setFechaActualizacion(LocalDateTime.now());
+
+            String rutaAnterior = entity.getDocumento().getUrl();
+            if (rutaAnterior != null) {
+                try {
+                    Path pathDelete = Paths.get(rutaAnterior);
+                    Files.deleteIfExists(pathDelete);
+                } catch (IOException e) {
+                    throw new RuntimeException(e.getMessage());
+                }
+            }
         }
 
         entity.setEliminado(true);
@@ -213,6 +242,15 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
     @Override
     public boolean canNewAdd(Long teacherId) {
         return !docenteLaboralRepository.existsByDocenteId(teacherId);
+    }
+
+    @Override
+    public Path getPdfPathById(Long id) {
+        DocenteLaboralEntity entity = getWithDocumentById(id);
+
+        if (entity.getDocumento().getUrl() == null) return null;
+
+        return Paths.get(entity.getDocumento().getUrl());
     }
 
     @Override
