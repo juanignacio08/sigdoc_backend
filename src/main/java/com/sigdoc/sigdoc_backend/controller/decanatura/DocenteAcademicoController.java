@@ -41,7 +41,7 @@ public class DocenteAcademicoController {
     public ResponseEntity<ResponseDTO<Object>> save(
             @RequestPart("data") @Valid DocenteAcademicoRequest request,
             @RequestPart(value = "file", required = false)  MultipartFile file
-            ) {
+    ) {
         try {
             DocenteAcademicoResponse response = docenteAcademicoService.save(request, file);
 

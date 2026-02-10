@@ -14,6 +14,7 @@ import com.sigdoc.sigdoc_backend.persistence.specification.DocenteSpecifications
 import com.sigdoc.sigdoc_backend.service.cache.TablaMaestraCache;
 import com.sigdoc.sigdoc_backend.service.cache.UbigeoCache;
 import com.sigdoc.sigdoc_backend.service.decanatura.DocenteService;
+import com.sigdoc.sigdoc_backend.service.util.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -36,12 +42,14 @@ public class DocenteServiceImpl implements DocenteService {
 
     private final DocenteRepository docenteRepository;
 
+    private final FileStorageService fileStorageService;
+
     private final TablaMaestraCache tablaMaestraCache;
     private final UbigeoCache ubigeoCache;
 
     @Override
     @Transactional
-    public DocenteResponse save(DocenteRequest request) {
+    public DocenteResponse save(DocenteRequest request, MultipartFile file) {
         String context = "saveTeacher";
         log.info("Registrando a un nuevo profesor. [ DOCENTE : {} | CONTEXTO : {} ]", request.getNumDocumento(), context);
 
@@ -66,6 +74,23 @@ public class DocenteServiceImpl implements DocenteService {
 
         teacher = DocenteRequest.toEntity.apply(request);
 
+        if (request.getFotografia() != null && file != null) {
+            if (file.isEmpty()) {
+                throw new BadRequestException("El archivo es obligatorio");
+            }
+
+            if (file.getSize() > 20 * 1024 * 1024) {
+                throw new BadRequestException("El archivo no debe superar los 20 MB");
+            }
+
+            if (!file.getContentType().startsWith("image/")) {
+                throw new BadRequestException("Solo se permiten archivos de imagen");
+            }
+
+            String path = fileStorageService.saveImage(file);
+            teacher.setUrlFotografia(path);
+        }
+
         DocenteEntity saved = docenteRepository.save(teacher);
 
         return DocenteResponse.toResponse.apply(saved);
@@ -74,7 +99,7 @@ public class DocenteServiceImpl implements DocenteService {
 
     @Override
     @Transactional
-    public DocenteResponse update(DocenteRequest request) {
+    public DocenteResponse update(DocenteRequest request, MultipartFile file) {
         String context = "updateTeacher";
         log.info("Actualizando los datos de un docente. [ DOCENTE : {} | CONTEXTO : {} ]", request.getNumDocumento(), context);
 
@@ -91,6 +116,39 @@ public class DocenteServiceImpl implements DocenteService {
         if (StringUtils.hasText(request.getCodUbigeoProcedencia()) && !ubigeoCache.existsUbigeo(request.getCodUbigeoProcedencia())) throw new BadRequestException("El ubigeo de residencia de procedencia es incorrecto.");
 
         DocenteRequest.toUpdateEntity(request, entity);
+
+        if (request.getFotografia() != null && file != null) {
+            if (file.isEmpty()) {
+                throw new BadRequestException("El archivo es obligatorio");
+            }
+
+            if (file.getSize() > 20 * 1024 * 1024) {
+                throw new BadRequestException("El archivo no debe superar los 20 MB");
+            }
+
+            if (!file.getContentType().startsWith("image/")) {
+                throw new BadRequestException("Solo se permiten archivos de imagen");
+            }
+
+            if (entity.getFotografia() != null) {
+                String rutaAnterior = entity.getUrlFotografia();
+
+                String path = fileStorageService.saveImage(file);
+                entity.setUrlFotografia(path);
+
+                if (rutaAnterior != null) {
+                    try {
+                        Path pathDelete = Paths.get(rutaAnterior);
+                        Files.deleteIfExists(pathDelete);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e.getMessage());
+                    }
+                }
+            } else {
+                String path = fileStorageService.saveImage(file);
+                entity.setUrlFotografia(path);
+            }
+        }
 
         DocenteEntity updated = docenteRepository.save(entity);
 
@@ -182,6 +240,15 @@ public class DocenteServiceImpl implements DocenteService {
     }
 
     @Override
+    public Path getImagePathById(Long id) {
+        DocenteEntity entity = getById(id);
+
+        if (entity.getUrlFotografia() == null) return null;
+
+        return Paths.get(entity.getUrlFotografia());
+    }
+
+    @Override
     public DocenteEntity getByDocumentNumber(String documentNumber) {
         return docenteRepository.getByDocumentNumber(documentNumber)
                 .orElseThrow(() -> new NotFoundException("Recurso no encontrado. [ DOCENTE ]"));
@@ -194,5 +261,7 @@ public class DocenteServiceImpl implements DocenteService {
         return docenteRepository.getByID(id)
                 .orElseThrow(() -> new NotFoundException("Recurso no encontrado. [ DOCENTE ]"));
     }
+
+
 
 }

@@ -11,10 +11,19 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @RestController
 @RequestMapping("/teacher")
@@ -25,10 +34,16 @@ public class DocenteController {
 
     private final DocenteService docenteService;
 
-    @PostMapping("/save")
-    public ResponseEntity<ResponseDTO<Object>> save(@RequestBody @Valid DocenteRequest request) {
+    @PostMapping(
+            value = "/save",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<ResponseDTO<Object>> save(
+            @RequestPart("data") @Valid DocenteRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
         try {
-            DocenteResponse response = docenteService.save(request);
+            DocenteResponse response = docenteService.save(request, file);
             ResponseDTO<Object> responseDTO = AppUtil.build(response, "Docente registrado correctamente!");
             return ResponseEntity.ok(responseDTO);
 
@@ -38,10 +53,16 @@ public class DocenteController {
         }
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<ResponseDTO<Object>> update(@RequestBody @Valid DocenteRequest request) {
+    @PutMapping(
+            value = "/update",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<ResponseDTO<Object>> update(
+            @RequestPart("data") @Valid DocenteRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
         try {
-            DocenteResponse response = docenteService.update(request);
+            DocenteResponse response = docenteService.update(request, file);
             ResponseDTO<Object> responseDTO = AppUtil.build(response, "Datos del docente actualizado correctamente!");
             return ResponseEntity.ok(responseDTO);
 
@@ -122,6 +143,43 @@ public class DocenteController {
             log.error("Error en getDetail: {} ", e.getMessage());
             throw e;
         }
+    }
+
+    @GetMapping("/imagen/{id}")
+    public ResponseEntity<Resource> getImagen(@PathVariable Long id) {
+
+        Path path = docenteService.getImagePathById(id);
+
+        if (path == null || !Files.exists(path)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Resource resource;
+        try {
+            resource = new UrlResource(path.toUri());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error al cargar la imagen");
+        }
+
+        MediaType mediaType = getMediaType(path);
+
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
+                .body(resource);
+    }
+
+    private MediaType getMediaType(Path path) {
+        String fileName = path.getFileName().toString().toLowerCase();
+
+        if (fileName.endsWith(".png")) {
+            return MediaType.IMAGE_PNG;
+        }
+        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+            return MediaType.IMAGE_JPEG;
+        }
+
+        return MediaType.APPLICATION_OCTET_STREAM;
     }
 
 }

@@ -67,6 +67,9 @@ public class DocenteEntity {
     @Column(name = "fotografia", columnDefinition = "TEXT")
     private String fotografia;
 
+    @Column(name = "urlfotografia", columnDefinition = "TEXT")
+    private String urlFotografia;
+
     @Column(name = "estado", nullable = false)
     private Integer estado;
 

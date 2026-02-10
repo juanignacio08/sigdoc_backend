@@ -35,6 +35,7 @@ public class DocenteResponse {
     private TablaMaestraResponse codEstadoCivil;
     private String telefono;
     private String fotografia;
+    private String urlFotografia;
     private Integer estado;
 
     private List<DocenteAcademicoResponse> infoAcademica;
@@ -72,6 +73,7 @@ public class DocenteResponse {
             )
             .telefono(entity.getTelefono())
             .fotografia(entity.getFotografia())
+            .urlFotografia(entity.getUrlFotografia())
             .estado(entity.getEstado())
             .build();
 
@@ -108,6 +110,7 @@ public class DocenteResponse {
             )
             .telefono(entity.getTelefono())
             .fotografia(entity.getFotografia())
+            .urlFotografia(entity.getUrlFotografia())
             .estado(entity.getEstado())
             .infoAcademica(entity.getAcademicsInfo().stream().map(DocenteAcademicoResponse.toResponse).toList())
             .build();
@@ -143,6 +146,7 @@ public class DocenteResponse {
                 .direccion(entity.getDireccion())
                 .telefono(entity.getTelefono())
                 .fotografia(entity.getFotografia())
+                .urlFotografia(entity.getUrlFotografia())
                 .estado(entity.getEstado())
                 .build();
     }
