@@ -198,6 +198,7 @@ public class ExperienciaProfesionalServiceImpl implements ExperienciaProfesional
     public Path getPdfPathById(Long id) {
         ExperienciaProfesionalEntity entity = getWithDocumentById(id);
 
+        if (entity.getDocumento() == null) return null;
         if (entity.getDocumento().getUrl() == null) return null;
 
         return Paths.get(entity.getDocumento().getUrl());

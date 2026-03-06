@@ -83,6 +83,7 @@ public class DepartamentoAcademicoServiceImpl implements DepartamentoAcademicoSe
     }
 
     @Override
+    @Transactional
     public DepartamentoAcademicoResponse delete(Long id) {
         String context = "deleteAcademicDepartment";
         log.info("Eliminado un departamento academico. [ DEPARTAMENTO-ACADEMICO : {} | CONTEXTO : {} ]", id, context);

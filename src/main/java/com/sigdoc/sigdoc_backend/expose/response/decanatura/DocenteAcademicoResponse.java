@@ -90,4 +90,26 @@ public class DocenteAcademicoResponse {
                 .build();
     }
 
+    public static DocenteAcademicoResponse toResponseWithMasterTableWithoutDocument(
+            DocenteAcademicoEntity entity,
+            TablaMaestraCache cache
+    ) {
+        return DocenteAcademicoResponse.builder()
+                .docenteAcademicoId(entity.getDocenteAcademicoId())
+                .docente(DocenteResponse.builder()
+                        .docenteId(entity.getDocente().getDocenteId())
+                        .build())
+                .codGradoAcademico(TablaMaestraResponse.buildTablaMaestra(
+                        cache.GRADO_ACADEMICO,
+                        entity.getCodGradoAcademico(),
+                        cache
+                ))
+                .tituloProfesional(entity.getTituloProfesional())
+                .institucionEgreso(entity.getInstitucionEgreso())
+                .fechaObtencion(DateConverterUtil.formatLocalDateToDDMMYYYY(entity.getFechaObtencion()))
+                .especialidad(entity.getEspecialidad())
+                .estado(entity.getEstado())
+                .build();
+    }
+
 }

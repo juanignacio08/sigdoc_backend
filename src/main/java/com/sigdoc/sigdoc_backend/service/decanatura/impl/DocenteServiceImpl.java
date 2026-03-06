@@ -164,10 +164,7 @@ public class DocenteServiceImpl implements DocenteService {
 
         Page<DocenteEntity> entityPage = docenteRepository.getAllPaginated(pageable);
 
-        return entityPage.map(
-                entity ->
-                        DocenteResponse.toResponseWithMasterTable(entity, tablaMaestraCache)
-        );
+        return entityPage.map(DocenteResponse.toResponse);
     }
 
     @Override
@@ -210,9 +207,7 @@ public class DocenteServiceImpl implements DocenteService {
 
         Page<DocenteEntity> entityPage = docenteRepository.findAll(specification, pageable);
 
-        return entityPage.map(entity ->
-                DocenteResponse.toResponseWithMasterTable(entity, tablaMaestraCache)
-        );
+        return entityPage.map(DocenteResponse.toResponse);
     }
 
     @Override
@@ -236,13 +231,13 @@ public class DocenteServiceImpl implements DocenteService {
     public DocenteResponse getDetail(String documentNumber) {
         DocenteEntity docente = docenteRepository.getDetailByID(documentNumber).orElseThrow(() -> new NotFoundException("No existe el docente"));
 
-        return DocenteResponse.toResponseDetail.apply(docente);
+        return DocenteResponse.toResponseWithMasterTable(docente, tablaMaestraCache);
     }
 
     @Override
     public Path getImagePathById(Long id) {
         DocenteEntity entity = getById(id);
-
+        log.info("Obteninedo Imagen. [ DOCENTE : {} ]", id);
         if (entity.getUrlFotografia() == null) return null;
 
         return Paths.get(entity.getUrlFotografia());
@@ -261,7 +256,5 @@ public class DocenteServiceImpl implements DocenteService {
         return docenteRepository.getByID(id)
                 .orElseThrow(() -> new NotFoundException("Recurso no encontrado. [ DOCENTE ]"));
     }
-
-
 
 }

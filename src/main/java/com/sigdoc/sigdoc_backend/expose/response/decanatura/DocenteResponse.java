@@ -7,7 +7,10 @@ import com.sigdoc.sigdoc_backend.expose.response.maestro.UbigeoResponse;
 import com.sigdoc.sigdoc_backend.expose.util.DateConverterUtil;
 import com.sigdoc.sigdoc_backend.service.cache.TablaMaestraCache;
 import lombok.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Function;
 
@@ -73,7 +76,7 @@ public class DocenteResponse {
             )
             .telefono(entity.getTelefono())
             .fotografia(entity.getFotografia())
-            .urlFotografia(entity.getUrlFotografia())
+            .urlFotografia(getUrlImage(entity.getFotografia(), entity.getUrlFotografia()))
             .estado(entity.getEstado())
             .build();
 
@@ -110,7 +113,7 @@ public class DocenteResponse {
             )
             .telefono(entity.getTelefono())
             .fotografia(entity.getFotografia())
-            .urlFotografia(entity.getUrlFotografia())
+            .urlFotografia(getUrlImage(entity.getFotografia(), entity.getUrlFotografia()))
             .estado(entity.getEstado())
             .infoAcademica(entity.getAcademicsInfo().stream().map(DocenteAcademicoResponse.toResponse).toList())
             .build();
@@ -119,6 +122,19 @@ public class DocenteResponse {
             DocenteEntity entity,
             TablaMaestraCache cache
     ) {
+        String fotoUrl = null;
+
+        if (entity.getFotografia() != null) {
+            Path path = Paths.get(entity.getUrlFotografia());
+            String nombreArchivo = path.getFileName().toString();
+
+            fotoUrl = ServletUriComponentsBuilder
+                    .fromCurrentContextPath()
+                    .path("/docentes/imagenes/")
+                    .path(nombreArchivo)
+                    .toUriString();
+        }
+
         return DocenteResponse.builder()
                 .docenteId(entity.getDocenteId())
                 .codTipoDocumento(TablaMaestraResponse.buildTablaMaestra(
@@ -144,11 +160,37 @@ public class DocenteResponse {
                 .emailPersonal(entity.getEmailPersonal())
                 .emailInstitucional(entity.getEmailInstitucional())
                 .direccion(entity.getDireccion())
+                .codUbigeoActual(UbigeoResponse.builder()
+                        .codigoUbigeo(entity.getCodigoUbigeoActual())
+                        .build())
+                .codUbigeoProcedencia(UbigeoResponse.builder()
+                        .codigoUbigeo(entity.getCodUbigeoProcedencia())
+                        .build())
                 .telefono(entity.getTelefono())
                 .fotografia(entity.getFotografia())
-                .urlFotografia(entity.getUrlFotografia())
+                .urlFotografia(fotoUrl)
                 .estado(entity.getEstado())
+                .infoAcademica(entity.getAcademicsInfo().stream()
+                        .map(academicoEntity -> DocenteAcademicoResponse.toResponseWithMasterTableWithoutDocument(academicoEntity, cache))
+                        .toList())
                 .build();
+    }
+
+    public static String getUrlImage(String photo, String url) {
+        String fotoUrl = null;
+
+        if (photo != null) {
+            Path path = Paths.get(url);
+            String nombreArchivo = path.getFileName().toString();
+
+            fotoUrl = ServletUriComponentsBuilder
+                    .fromCurrentContextPath()
+                    .path("/docentes/imagenes/")
+                    .path(nombreArchivo)
+                    .toUriString();
+        }
+
+        return fotoUrl;
     }
 
 

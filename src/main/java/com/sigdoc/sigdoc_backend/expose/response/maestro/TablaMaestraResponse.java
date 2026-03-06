@@ -44,10 +44,7 @@ public class TablaMaestraResponse {
     ) {
         if (itemCode == null) return null;
 
-        return TablaMaestraResponse.builder()
-                .codigo(itemCode)
-                .denominacion(cache.getDenominacion(tableCode, itemCode))
-                .build();
+        return cache.getTable(tableCode, itemCode);
     }
 
 }

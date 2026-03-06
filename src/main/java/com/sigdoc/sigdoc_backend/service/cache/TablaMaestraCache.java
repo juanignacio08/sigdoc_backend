@@ -1,6 +1,7 @@
 package com.sigdoc.sigdoc_backend.service.cache;
 
 import com.sigdoc.sigdoc_backend.entity.maestro.TablaMaestraEntity;
+import com.sigdoc.sigdoc_backend.expose.response.maestro.TablaMaestraResponse;
 import com.sigdoc.sigdoc_backend.persistence.repository.maestro.TablaMaestraRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ public class TablaMaestraCache {
 
     private final TablaMaestraRepository tablaMaestraRepository;
 
-    private Map<String, Map<String, String>> cacheMasterTable;
+    private Map<String, Map<String, TablaMaestraResponse>> cacheMasterTable;
 
     public final String TIPO_DOCUMENTO_IDENTIDAD = "001";
     public final String GENERO = "002";
@@ -44,7 +45,11 @@ public class TablaMaestraCache {
 
         for (TablaMaestraEntity t : registros) {
             cacheMasterTable.computeIfAbsent(t.getCodigoTabla(), k -> new HashMap<>())
-                    .put(t.getCodigo(), t.getDenominacion());
+                    .put(t.getCodigo(),
+                            TablaMaestraResponse.builder()
+                                    .denominacion(t.getDenominacion())
+                                    .abreviatura(t.getAbreviatura())
+                                    .build());
         }
 
         log.info("================ Cache de Tabla Maestra cargado correctamente. ================");
@@ -55,7 +60,7 @@ public class TablaMaestraCache {
                 && cacheMasterTable.get(tableCode).containsKey(itemCode);
     }
 
-    public String getDenominacion(String tableCode, String itemCode) {
+    public TablaMaestraResponse getTable(String tableCode, String itemCode) {
         return Optional.ofNullable(cacheMasterTable.get(tableCode))
                 .map(m -> m.get(itemCode))
                 .orElse(null);

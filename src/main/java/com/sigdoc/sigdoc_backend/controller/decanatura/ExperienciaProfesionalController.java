@@ -81,7 +81,7 @@ public class ExperienciaProfesionalController {
     ) {
         try {
             if (page < 0) page = 0;
-            if (size < 1 || size > 100) size = 10;
+            if (size < 1 || size > 10000) size = 1000;
 
             Page<ExperienciaProfesionalResponse> responsePage =
                     docenteExperienciaProfesionalService.getPaginatedByDocente(page, size, documentNumber);

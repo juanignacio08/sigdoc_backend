@@ -7,6 +7,9 @@ spring:
     name: sigdoc_backend
   main:
     allow-bean-definition-overriding: true
+  web:
+    resources:
+      static-locations: file:uploads/
   datasource:
     url: jdbc:postgresql://localhost:5432/sigdoc
     username: postgres
