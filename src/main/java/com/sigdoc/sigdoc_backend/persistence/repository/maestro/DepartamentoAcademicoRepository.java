@@ -30,4 +30,9 @@ public interface DepartamentoAcademicoRepository extends JpaRepository<Departame
         return findByFacultad_FacultadIdAndEliminadoOrderByDenominacionAsc(facultyId, false);
     }
 
+    List<DepartamentoAcademicoEntity> findByEstadoAndEliminadoOrderByDenominacionAsc(Integer status, boolean deleted);
+    default List<DepartamentoAcademicoEntity> getAll() {
+        return findByEstadoAndEliminadoOrderByDenominacionAsc(1, false);
+    }
+
 }

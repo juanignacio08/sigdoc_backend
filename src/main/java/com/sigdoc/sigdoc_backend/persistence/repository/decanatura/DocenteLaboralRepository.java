@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,7 +19,7 @@ public interface DocenteLaboralRepository extends JpaRepository<DocenteLaboralEn
         return findByDocenteLaboralIdAndEliminado(id, false);
     }
 
-    @EntityGraph(attributePaths = {"documento", "docente", "departamentoAcademico"})
+    @EntityGraph(attributePaths = {"documento", "docente", "departamentoAcademico", "escuelaProfesional"})
     Optional<DocenteLaboralEntity> findByDocenteLaboralIdAndEliminadoEquals(Long id, boolean deleted);
     default Optional<DocenteLaboralEntity> getDetailByID(Long id) {
         return findByDocenteLaboralIdAndEliminadoEquals(id, false);
@@ -58,6 +59,12 @@ public interface DocenteLaboralRepository extends JpaRepository<DocenteLaboralEn
     boolean existsByDocenteLaboralIdNotAndEmailInstitucionalIgnoreCaseAndEliminado(Long id, String email, boolean deleted);
     default boolean existsByInstitutionalEmail(Long id, String institutionalEmail) {
         return existsByDocenteLaboralIdNotAndEmailInstitucionalIgnoreCaseAndEliminado(id, institutionalEmail, false);
+    }
+
+    @EntityGraph(attributePaths = {"escuelaProfesional", "departamentoAcademico"})
+    List<DocenteLaboralEntity> findByEliminadoAndEstado(Boolean deleted, Integer status);
+    default List<DocenteLaboralEntity> getAllActives() {
+        return findByEliminadoAndEstado(false, 1);
     }
 
 }

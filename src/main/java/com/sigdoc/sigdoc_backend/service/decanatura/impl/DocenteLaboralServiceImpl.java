@@ -3,6 +3,7 @@ package com.sigdoc.sigdoc_backend.service.decanatura.impl;
 import com.sigdoc.sigdoc_backend.entity.decanatura.*;
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteLaboralEntity;
 import com.sigdoc.sigdoc_backend.entity.maestro.DepartamentoAcademicoEntity;
+import com.sigdoc.sigdoc_backend.entity.maestro.EscuelaProfesionalEntity;
 import com.sigdoc.sigdoc_backend.exceptions.BadRequestException;
 import com.sigdoc.sigdoc_backend.exceptions.BusinessRuleException;
 import com.sigdoc.sigdoc_backend.exceptions.NotFoundException;
@@ -15,6 +16,7 @@ import com.sigdoc.sigdoc_backend.service.cache.TablaMaestraCache;
 import com.sigdoc.sigdoc_backend.service.decanatura.DocenteLaboralService;
 import com.sigdoc.sigdoc_backend.service.decanatura.DocenteService;
 import com.sigdoc.sigdoc_backend.service.maestro.DepartamentoAcademicoService;
+import com.sigdoc.sigdoc_backend.service.maestro.EscuelaProfesionalService;
 import com.sigdoc.sigdoc_backend.service.util.FileStorageService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +43,7 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
 
     private final DocenteService docenteService;
     private final DepartamentoAcademicoService departamentoAcademicoService;
+    private final EscuelaProfesionalService escuelaProfesionalService;
     private final FileStorageService fileStorageService;
 
     private final TablaMaestraCache tablaMaestraCache;
@@ -54,6 +57,8 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
         DocenteEntity docente = docenteService.getById(request.getDocenteId());
 
         DepartamentoAcademicoEntity departamentoAcademico = departamentoAcademicoService.getById(request.getDepartamentoId());
+
+        EscuelaProfesionalEntity escuelaProfesional = escuelaProfesionalService.getById(request.getEscuelaId());
 
         if (docenteLaboralRepository.existsByDocenteId(request.getDocenteId())) throw new BusinessRuleException("El docente ya cuenta con una información laboral activa.\n" +
                 "Para registrar una nueva, primero debe desactivar la información actual.");
@@ -76,6 +81,7 @@ public class DocenteLaboralServiceImpl implements DocenteLaboralService {
 
         entity.setDocente(docente);
         entity.setDepartamentoAcademico(departamentoAcademico);
+        entity.setEscuelaProfesional(escuelaProfesional);
 
         if (request.getDocumento() != null && file != null) {
             if (!tablaMaestraCache.existsItem(tablaMaestraCache.TIPO_DOCUMENTO, request.getDocumento().getCodTipoDocumento())) throw new BadRequestException("El tipo de documento seleccionado no es válido. Verifique la opción elegida y vuelva a intentarlo.");

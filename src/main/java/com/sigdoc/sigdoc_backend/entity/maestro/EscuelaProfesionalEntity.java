@@ -32,6 +32,12 @@ public class EscuelaProfesionalEntity {
     @JoinColumn(name = "departamentoacademicoid", nullable = false)
     private DepartamentoAcademicoEntity departamentoAcademico;
 
+    @Column(name = "color", length = 10)
+    private String color;
+
+    @Column(name = "imagen", length = 250)
+    private String imagen;
+
     @Column(name = "estado", nullable = false)
     private Integer estado;
 

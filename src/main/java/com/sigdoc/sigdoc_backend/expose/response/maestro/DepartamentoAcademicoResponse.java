@@ -19,6 +19,8 @@ public class DepartamentoAcademicoResponse {
     private String denominacion;
     private String abreviatura;
     private FacultadResponse facultad;
+    private String color;
+    private String imagen;
     private Integer estado;
 
     public static final Function<DepartamentoAcademicoEntity, DepartamentoAcademicoResponse> toResponse =
@@ -29,6 +31,9 @@ public class DepartamentoAcademicoResponse {
                     .facultad(FacultadResponse.builder()
                             .facultadId(entity.getFacultad().getFacultadId())
                             .build())
+
+                    .color(entity.getColor())
+                    .imagen(entity.getImagen())
                     .estado(entity.getEstado())
                     .build();
 
@@ -38,6 +43,8 @@ public class DepartamentoAcademicoResponse {
                     .denominacion(entity.getDenominacion())
                     .abreviatura(entity.getAbreviatura())
                     .facultad(FacultadResponse.toResponse.apply(entity.getFacultad()))
+                    .color(entity.getColor())
+                    .imagen(entity.getImagen())
                     .estado(entity.getEstado())
                     .build();
 }

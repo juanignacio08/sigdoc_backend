@@ -1,6 +1,7 @@
 package com.sigdoc.sigdoc_backend.entity.decanatura;
 
 import com.sigdoc.sigdoc_backend.entity.maestro.DepartamentoAcademicoEntity;
+import com.sigdoc.sigdoc_backend.entity.maestro.EscuelaProfesionalEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -32,6 +33,10 @@ public class DocenteLaboralEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "departamentoid", nullable = false)
     private DepartamentoAcademicoEntity departamentoAcademico;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "escuelaid", nullable = false)
+    private EscuelaProfesionalEntity escuelaProfesional;
 
     @Column(name = "codigoinstitucional", length = 10)
     private String codigoInstitucional;

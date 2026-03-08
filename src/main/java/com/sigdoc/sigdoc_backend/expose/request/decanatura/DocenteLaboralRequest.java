@@ -30,6 +30,10 @@ public class DocenteLaboralRequest {
     @Min(value = 1, message = "El departamentoId debe ser mayor o igual a 1")
     private Long departamentoId;
 
+    @NotNull(message = "El campo escuelaId es requerido")
+    @Min(value = 1, message = "La escuelaId debe ser mayor o igual a 1")
+    private Long escuelaId;
+
     @Size(max = 10, message = "El código institucional debe tener como máximo 10 caracteres")
     private String codigoInstitucional;
 

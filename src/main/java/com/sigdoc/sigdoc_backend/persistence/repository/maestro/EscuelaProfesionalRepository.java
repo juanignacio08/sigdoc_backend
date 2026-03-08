@@ -28,4 +28,9 @@ public interface EscuelaProfesionalRepository extends JpaRepository<EscuelaProfe
         return findByDepartamentoAcademico_DepartamentoAcademicoIdAndEliminadoOrderByDenominacionAsc(departamenteAcademicoId, false);
     }
 
+    List<EscuelaProfesionalEntity> findByEstadoAndEliminadoOrderByDenominacionAsc(Integer status, boolean deleted);
+    default List<EscuelaProfesionalEntity> getAll() {
+        return findByEstadoAndEliminadoOrderByDenominacionAsc(1, false);
+    }
+
 }

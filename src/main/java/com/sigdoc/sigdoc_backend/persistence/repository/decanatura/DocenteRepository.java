@@ -43,4 +43,6 @@ public interface DocenteRepository extends JpaRepository<DocenteEntity, Long>, J
             @NonNull Pageable pageable
     );
 
+    Long countByEliminadoFalseAndEstadoEquals(Integer estado);
+
 }

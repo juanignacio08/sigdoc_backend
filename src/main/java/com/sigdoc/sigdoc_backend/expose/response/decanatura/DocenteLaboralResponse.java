@@ -1,9 +1,9 @@
 package com.sigdoc.sigdoc_backend.expose.response.decanatura;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteAcademicoEntity;
 import com.sigdoc.sigdoc_backend.entity.decanatura.DocenteLaboralEntity;
 import com.sigdoc.sigdoc_backend.expose.response.maestro.DepartamentoAcademicoResponse;
+import com.sigdoc.sigdoc_backend.expose.response.maestro.EscuelaProfesionalResponse;
 import com.sigdoc.sigdoc_backend.expose.response.maestro.TablaMaestraResponse;
 import com.sigdoc.sigdoc_backend.expose.util.DateConverterUtil;
 import com.sigdoc.sigdoc_backend.service.cache.TablaMaestraCache;
@@ -23,6 +23,7 @@ public class DocenteLaboralResponse {
     private Long docenteLaboralId;
     private DocenteResponse docente;
     private DepartamentoAcademicoResponse departamentoAcademico;
+    private EscuelaProfesionalResponse escuelaProfesional;
     private String codigoInstitucional;
     private String emailInstitucional;
     private TablaMaestraResponse codRegimenLaboral;
@@ -42,6 +43,9 @@ public class DocenteLaboralResponse {
                             .build())
                     .departamentoAcademico(DepartamentoAcademicoResponse.builder()
                             .departamentoAcademicoId(entity.getDepartamentoAcademico().getDepartamentoAcademicoId())
+                            .build())
+                    .escuelaProfesional(EscuelaProfesionalResponse.builder()
+                            .escuelaProfesionalId(entity.getEscuelaProfesional().getEscuelaProfesionalId())
                             .build())
                     .codigoInstitucional(entity.getCodigoInstitucional())
                     .emailInstitucional(entity.getEmailInstitucional())
@@ -76,6 +80,7 @@ public class DocenteLaboralResponse {
                     .docente(DocenteResponse.toResponse.apply(entity.getDocente()))
                     .departamentoAcademico(DepartamentoAcademicoResponse.toResponse.apply(
                             entity.getDepartamentoAcademico()))
+                    .escuelaProfesional(EscuelaProfesionalResponse.toResponse.apply(entity.getEscuelaProfesional()))
                     .codigoInstitucional(entity.getCodigoInstitucional())
                     .emailInstitucional(entity.getEmailInstitucional())
                     .codRegimenLaboral(TablaMaestraResponse.builder()
@@ -110,6 +115,7 @@ public class DocenteLaboralResponse {
                 .docente(DocenteResponse.toResponse.apply(entity.getDocente()))
                 .departamentoAcademico(DepartamentoAcademicoResponse.toResponse.apply(
                         entity.getDepartamentoAcademico()))
+                .escuelaProfesional(EscuelaProfesionalResponse.toResponse.apply(entity.getEscuelaProfesional()))
                 .codigoInstitucional(entity.getCodigoInstitucional())
                 .emailInstitucional(entity.getEmailInstitucional())
                 .codRegimenLaboral(TablaMaestraResponse.buildTablaMaestra(

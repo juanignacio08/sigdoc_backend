@@ -35,6 +35,12 @@ public class EscuelaProfesionalRequest {
     @Min(value = 1, message = "El id de la facultad debe ser mayor o igual a 1")
     private Long departamentoAcademicoId;
 
+    @Size(max = 10, message = "El color debe tener como máximo 10 caracteres")
+    private String color;
+
+    @Size(max = 250, message = "La imagen debe tener como máximo 250 caracteres")
+    private String imagen;
+
     private Integer estado;
 
     public static final Function<EscuelaProfesionalRequest, EscuelaProfesionalEntity> toEntity =
@@ -42,6 +48,8 @@ public class EscuelaProfesionalRequest {
                     .denominacion(request.getDenominacion())
                     .abreviatura(request.getAbreviatura())
                     .estado(1)
+                    .color(request.getColor())
+                    .imagen(request.getImagen())
                     .actualizadoPor(SecurityUtil.getCurrentUserId())
                     .fechaActualizacion(LocalDateTime.now())
                     .creadoPor(SecurityUtil.getCurrentUserId())
@@ -52,7 +60,8 @@ public class EscuelaProfesionalRequest {
     public static void toUpdateEntity(EscuelaProfesionalRequest request, EscuelaProfesionalEntity entity) {
         entity.setDenominacion(request.getDenominacion());
         entity.setAbreviatura(request.getAbreviatura());
-
+        entity.setColor(request.getColor());
+        entity.setImagen(request.getImagen());
         if (request.getEstado() != null) {
             entity.setEstado(request.getEstado());
         }
