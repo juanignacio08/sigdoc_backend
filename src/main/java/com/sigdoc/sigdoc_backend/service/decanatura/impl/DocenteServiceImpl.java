@@ -34,6 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = @__(@Autowired))
@@ -83,7 +84,7 @@ public class DocenteServiceImpl implements DocenteService {
                 throw new BadRequestException("El archivo no debe superar los 20 MB");
             }
 
-            if (!file.getContentType().startsWith("image/")) {
+            if (!Objects.requireNonNull(file.getContentType()).startsWith("image/")) {
                 throw new BadRequestException("Solo se permiten archivos de imagen");
             }
 
@@ -126,7 +127,7 @@ public class DocenteServiceImpl implements DocenteService {
                 throw new BadRequestException("El archivo no debe superar los 20 MB");
             }
 
-            if (!file.getContentType().startsWith("image/")) {
+            if (!Objects.requireNonNull(file.getContentType()).startsWith("image/")) {
                 throw new BadRequestException("Solo se permiten archivos de imagen");
             }
 
@@ -231,7 +232,7 @@ public class DocenteServiceImpl implements DocenteService {
     public DocenteResponse getDetail(String documentNumber) {
         DocenteEntity docente = docenteRepository.getDetailByID(documentNumber).orElseThrow(() -> new NotFoundException("No existe el docente"));
 
-        return DocenteResponse.toResponseWithMasterTable(docente, tablaMaestraCache);
+        return DocenteResponse.toResponseWithMasterTable(docente, tablaMaestraCache, ubigeoCache);
     }
 
     @Override

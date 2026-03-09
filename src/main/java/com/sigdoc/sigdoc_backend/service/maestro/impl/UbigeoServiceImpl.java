@@ -4,6 +4,7 @@ import com.sigdoc.sigdoc_backend.entity.maestro.UbigeoEntity;
 import com.sigdoc.sigdoc_backend.exceptions.NotFoundException;
 import com.sigdoc.sigdoc_backend.expose.response.maestro.UbigeoResponse;
 import com.sigdoc.sigdoc_backend.persistence.repository.maestro.UbigeoRepository;
+import com.sigdoc.sigdoc_backend.service.cache.UbigeoCache;
 import com.sigdoc.sigdoc_backend.service.maestro.UbigeoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,15 +20,18 @@ public class UbigeoServiceImpl implements UbigeoService {
 
     private final UbigeoRepository ubigeoRepository;
 
+    private final UbigeoCache ubigeoCache;
+
     @Override
     public List<UbigeoResponse> getDepartamentos() {
         String context = "getDepartaments";
         log.info("Obteniendo departamentos. [ CONTEXTO : {} ]", context);
 
-        List<UbigeoEntity> list = ubigeoRepository.getDepartamentos();
+        // List<UbigeoProjection> list = ubigeoRepository.getDepartamentos();
+        List<UbigeoEntity> list = ubigeoCache.getDepartamentos();
 
         return list.stream()
-                .map(UbigeoResponse.toResponseDepartaments)
+                .map(UbigeoResponse.toResponse)
                 .toList();
     }
 
@@ -36,23 +40,21 @@ public class UbigeoServiceImpl implements UbigeoService {
         String context = "getProvinces";
         log.info("Obteniendo Provincias de un departamento. [ DEPARTAMENTO : {} | CONTEXTO : {} ]", codeDepartamento, context);
 
-        if (!ubigeoRepository.existsDepartamentByCode(codeDepartamento)) throw new NotFoundException("Recurso no encontrado. [ DEPARTAMENTO ]");
+        //List<UbigeoProjection> list = ubigeoRepository.getProvincias(codeDepartamento);
+        List<UbigeoEntity> list = ubigeoCache.getProvincias(codeDepartamento);
 
-        List<UbigeoEntity> list = ubigeoRepository.getProvinces(codeDepartamento);
-
-        return list.stream().map(UbigeoResponse.toResponseProvinces).toList();
+        return list.stream().map(UbigeoResponse.toResponse).toList();
     }
 
     @Override
-    public List<UbigeoResponse> getDistritos(String codeDepartamento, String codeProvincia) {
+    public List<UbigeoResponse> getDistritos(String codeProvincia) {
         String context = "getProvinces";
-        log.info("Obteniendo Provincias de un departamento. [ DEPARTAMENTO : {} | PROVINCIA : {} | CONTEXTO : {} ]", codeDepartamento, codeProvincia, context);
+        log.info("Obteniendo Distritos de una provincia. [ PROVINCIA : {} | CONTEXTO : {} ]", codeProvincia, context);
 
-        if (!ubigeoRepository.existsProvinceByCode(codeDepartamento, codeProvincia)) throw new NotFoundException("Recurso no encontrado. [ PROVINCIA ]");
+        //List<UbigeoProjection> list = ubigeoRepository.getDistritos(codeProvincia);
+        List<UbigeoEntity> list = ubigeoCache.getDistritos(codeProvincia);
 
-        List<UbigeoEntity> list = ubigeoRepository.getDistricts(codeDepartamento, codeProvincia);
-
-        return list.stream().map(UbigeoResponse.toResponseDistricts).toList();
+        return list.stream().map(UbigeoResponse.toResponse).toList();
     }
 
     @Override
@@ -60,28 +62,14 @@ public class UbigeoServiceImpl implements UbigeoService {
         String context = "getUbigeo";
         log.info("Obteniendo la informacion a detalle de un ubigeo. [ UBIGEO : {} | CONTEXT : {} ]", code, context);
 
-        String departamentCode = code.substring(0, 2);
-        String provinceCode = code.substring(2, 4);
+        UbigeoEntity entity = ubigeoCache.getDistrito(code);
 
-        UbigeoEntity entity = ubigeoRepository.getByCode(code)
-                .orElseThrow(() -> new NotFoundException("Registro no encontrado. [ UBIGEO ]"));
+        if (entity == null) throw new NotFoundException("Registro no encontrado. [ UBIGEO ]");
 
-        UbigeoEntity departament = ubigeoRepository.getDepartamentByCode(departamentCode)
-                .orElseThrow(() -> new NotFoundException("Registro no encontrado. [ DEPARTAMENTO ]"));
+        //UbigeoEntity entity = ubigeoRepository.findByUbigeo(code)
+        //        .orElseThrow(() -> new NotFoundException("Registro no encontrado. [ UBIGEO ]"));
 
-        UbigeoEntity province = ubigeoRepository.getProvinceByCode(departamentCode, provinceCode)
-                .orElseThrow(() -> new NotFoundException("Registro no encontrado. [ PROVINCIA ]"));
-
-        return UbigeoResponse.builder()
-                .codigoUbigeo(entity.getCodigoUbigeo())
-                .codigoRegion(departament.getCodigoRegion())
-                .denominacionRegion(departament.getDenominacion())
-                .codigoProvincia(province.getCodigoProvincia())
-                .denominacionProvincia(province.getDenominacion())
-                .codigoDistrito(entity.getCodigoDistrito())
-                .denominacionDistrito(entity.getDenominacion())
-                .estado(entity.getEstado())
-                .build();
+        return UbigeoResponse.toResponse.apply(entity);
     }
 
 }

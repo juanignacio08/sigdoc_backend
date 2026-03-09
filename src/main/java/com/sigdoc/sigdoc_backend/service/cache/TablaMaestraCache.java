@@ -1,7 +1,6 @@
 package com.sigdoc.sigdoc_backend.service.cache;
 
 import com.sigdoc.sigdoc_backend.entity.maestro.TablaMaestraEntity;
-import com.sigdoc.sigdoc_backend.expose.response.maestro.TablaMaestraResponse;
 import com.sigdoc.sigdoc_backend.persistence.repository.maestro.TablaMaestraRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -18,7 +18,8 @@ public class TablaMaestraCache {
 
     private final TablaMaestraRepository tablaMaestraRepository;
 
-    private Map<String, Map<String, TablaMaestraResponse>> cacheMasterTable;
+    private Map<String, List<TablaMaestraEntity>> cacheByTable;
+    private Map<String, TablaMaestraEntity> cacheByCode;
 
     public final String TIPO_DOCUMENTO_IDENTIDAD = "001";
     public final String GENERO = "002";
@@ -37,33 +38,40 @@ public class TablaMaestraCache {
 
     @PostConstruct
     public void loadCache() {
-        log.info("================ Cargando cache de Tabla Maestra... ================");
+        log.info("Cargando doble caché de Tabla Maestra...");
+        List<TablaMaestraEntity> allItems = tablaMaestraRepository.getAll();
 
-        cacheMasterTable = new HashMap<>();
+        this.cacheByCode = allItems.stream()
+                .collect(Collectors.toMap(
+                        TablaMaestraEntity::getCodigo,
+                        item -> item
+                ));
 
-        List<TablaMaestraEntity> registros = tablaMaestraRepository.getAll();
+        this.cacheByTable = allItems.stream()
+                .filter(item -> !item.getCodigoItem().equals("000"))
+                .sorted(Comparator.comparing(TablaMaestraEntity::getOrden))
+                .collect(Collectors.groupingBy(TablaMaestraEntity::getCodigoTabla));
 
-        for (TablaMaestraEntity t : registros) {
-            cacheMasterTable.computeIfAbsent(t.getCodigoTabla(), k -> new HashMap<>())
-                    .put(t.getCodigo(),
-                            TablaMaestraResponse.builder()
-                                    .denominacion(t.getDenominacion())
-                                    .abreviatura(t.getAbreviatura())
-                                    .build());
+        log.info("Caché optimizado correctamente.");
+    }
+
+    public boolean existsItem(String tableCode, String code) {
+        List<TablaMaestraEntity> tableItems = cacheByTable.get(tableCode);
+
+        if (tableItems == null) {
+            return false;
         }
 
-        log.info("================ Cache de Tabla Maestra cargado correctamente. ================");
+        return tableItems.stream()
+                .anyMatch(item -> item.getCodigo().equals(code));
     }
 
-    public boolean existsItem(String tableCode, String itemCode) {
-        return cacheMasterTable.containsKey(tableCode)
-                && cacheMasterTable.get(tableCode).containsKey(itemCode);
+    public TablaMaestraEntity getItem(String code) {
+        return cacheByCode.get(code);
     }
 
-    public TablaMaestraResponse getTable(String tableCode, String itemCode) {
-        return Optional.ofNullable(cacheMasterTable.get(tableCode))
-                .map(m -> m.get(itemCode))
-                .orElse(null);
+    public List<TablaMaestraEntity> getItemsByTableCode(String tableCode) {
+        return cacheByTable.getOrDefault(tableCode, Collections.emptyList());
     }
 
     public void reload() {

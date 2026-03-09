@@ -51,11 +51,10 @@ public class UbigeoController {
 
     @GetMapping("/getDistritos")
     public ResponseEntity<ResponseDTO<Object>> getDistricts(
-            @RequestParam(name = "departamentCode") String departamentCode,
             @RequestParam(name = "provinceCode") String provinceCode
     ) {
         try {
-            List<UbigeoResponse> response = ubigeoService.getDistritos(departamentCode, provinceCode);
+            List<UbigeoResponse> response = ubigeoService.getDistritos(provinceCode);
             ResponseDTO<Object> responseDTO = AppUtil.build(response, "Obteniendo todos los distritos de una provincia.");
             return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {

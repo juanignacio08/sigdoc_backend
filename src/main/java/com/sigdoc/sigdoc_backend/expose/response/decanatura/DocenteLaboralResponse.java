@@ -118,25 +118,17 @@ public class DocenteLaboralResponse {
                 .escuelaProfesional(EscuelaProfesionalResponse.toResponse.apply(entity.getEscuelaProfesional()))
                 .codigoInstitucional(entity.getCodigoInstitucional())
                 .emailInstitucional(entity.getEmailInstitucional())
-                .codRegimenLaboral(TablaMaestraResponse.buildTablaMaestra(
-                        cache.REGIMEN_LABORAL,
-                        entity.getCodRegimenLaboral(),
-                        cache
+                .codRegimenLaboral(TablaMaestraResponse.toResponse.apply(
+                        cache.getItem(entity.getCodRegimenLaboral())
                 ))
-                .codCategoriaDocenteNombrado(TablaMaestraResponse.buildTablaMaestra(
-                        cache.CATEGORIA_DOCENTE,
-                        entity.getCodCategoriaDocenteNombrado(),
-                        cache
+                .codCategoriaDocenteNombrado(TablaMaestraResponse.toResponse.apply(
+                        cache.getItem(entity.getCodCategoriaDocenteNombrado())
                 ))
-                .codNivelDocenteContratado(TablaMaestraResponse.buildTablaMaestra(
-                        cache.NIVEL_DOCENTE,
-                        entity.getCodNivelDocenteContratado(),
-                        cache
+                .codNivelDocenteContratado(TablaMaestraResponse.toResponse.apply(
+                        cache.getItem(entity.getCodNivelDocenteContratado())
                 ))
-                .codTiempoDedicacion(TablaMaestraResponse.buildTablaMaestra(
-                        cache.TIEMPO_DEDICACION,
-                        entity.getCodTiempoDedicacion(),
-                        cache
+                .codTiempoDedicacion(TablaMaestraResponse.toResponse.apply(
+                        cache.getItem(entity.getCodTiempoDedicacion())
                 ))
                 .fechaInicio(DateConverterUtil.formatLocalDateToDDMMYYYY(entity.getFechaInicio()))
                 .fechaFin(DateConverterUtil.formatLocalDateToDDMMYYYY(entity.getFechaFin()))

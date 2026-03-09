@@ -75,10 +75,8 @@ public class DocenteAcademicoResponse {
                 .docente(DocenteResponse.builder()
                         .docenteId(entity.getDocente().getDocenteId())
                         .build())
-                .codGradoAcademico(TablaMaestraResponse.buildTablaMaestra(
-                        cache.GRADO_ACADEMICO,
-                        entity.getCodGradoAcademico(),
-                        cache
+                .codGradoAcademico(TablaMaestraResponse.toResponse.apply(
+                        cache.getItem(entity.getCodGradoAcademico())
                 ))
                 .tituloProfesional(entity.getTituloProfesional())
                 .institucionEgreso(entity.getInstitucionEgreso())
@@ -99,10 +97,8 @@ public class DocenteAcademicoResponse {
                 .docente(DocenteResponse.builder()
                         .docenteId(entity.getDocente().getDocenteId())
                         .build())
-                .codGradoAcademico(TablaMaestraResponse.buildTablaMaestra(
-                        cache.GRADO_ACADEMICO,
-                        entity.getCodGradoAcademico(),
-                        cache
+                .codGradoAcademico(TablaMaestraResponse.toResponse.apply(
+                        cache.getItem(entity.getCodGradoAcademico())
                 ))
                 .tituloProfesional(entity.getTituloProfesional())
                 .institucionEgreso(entity.getInstitucionEgreso())

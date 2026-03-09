@@ -8,6 +8,7 @@ import com.sigdoc.sigdoc_backend.expose.request.maestro.TablaMaestraRequest;
 import com.sigdoc.sigdoc_backend.expose.response.maestro.TablaMaestraResponse;
 import com.sigdoc.sigdoc_backend.expose.util.SecurityUtil;
 import com.sigdoc.sigdoc_backend.persistence.repository.maestro.TablaMaestraRepository;
+import com.sigdoc.sigdoc_backend.service.cache.TablaMaestraCache;
 import com.sigdoc.sigdoc_backend.service.maestro.TablaMaestraService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,8 @@ import java.util.List;
 public class TablaMaestraServiceImpl implements TablaMaestraService {
 
     private final TablaMaestraRepository tablaMaestraRepository;
+
+    private final TablaMaestraCache tablaMaestraCache;
 
     @Override
     @Transactional
@@ -96,7 +99,8 @@ public class TablaMaestraServiceImpl implements TablaMaestraService {
         String context = "getAllActivesItemsFromTable";
         log.info("Obteniendo los items activos de una tabla. [ TABLA : {} | CONTEXTO : {} ]", tableCode, context);
 
-        List<TablaMaestraEntity> list = getActivesItemsFromTable(tableCode);
+        List<TablaMaestraEntity> list = tablaMaestraCache.getItemsByTableCode(tableCode);
+        //List<TablaMaestraEntity> list = tablaMaestraRepository.getAllActivesItemsByTable(tableCode);
 
         return list.stream()
                 .map(TablaMaestraResponse.toResponse)

@@ -6,6 +6,7 @@ import com.sigdoc.sigdoc_backend.expose.response.maestro.TablaMaestraResponse;
 import com.sigdoc.sigdoc_backend.expose.response.maestro.UbigeoResponse;
 import com.sigdoc.sigdoc_backend.expose.util.DateConverterUtil;
 import com.sigdoc.sigdoc_backend.service.cache.TablaMaestraCache;
+import com.sigdoc.sigdoc_backend.service.cache.UbigeoCache;
 import lombok.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -64,10 +65,10 @@ public class DocenteResponse {
             )
             .direccion(entity.getDireccion())
             .codUbigeoActual(UbigeoResponse.builder()
-                    .codigoUbigeo(entity.getCodigoUbigeoActual())
+                    .ubigeo(entity.getCodigoUbigeoActual())
                     .build())
             .codUbigeoProcedencia(UbigeoResponse.builder()
-                    .codigoUbigeo(entity.getCodUbigeoProcedencia())
+                    .ubigeo(entity.getCodUbigeoProcedencia())
                     .build())
             .codEstadoCivil(
                     TablaMaestraResponse.builder()
@@ -101,10 +102,10 @@ public class DocenteResponse {
             )
             .direccion(entity.getDireccion())
             .codUbigeoActual(UbigeoResponse.builder()
-                    .codigoUbigeo(entity.getCodigoUbigeoActual())
+                    .ubigeo(entity.getCodigoUbigeoActual())
                     .build())
             .codUbigeoProcedencia(UbigeoResponse.builder()
-                    .codigoUbigeo(entity.getCodUbigeoProcedencia())
+                    .ubigeo(entity.getCodUbigeoProcedencia())
                     .build())
             .codEstadoCivil(
                     TablaMaestraResponse.builder()
@@ -120,7 +121,8 @@ public class DocenteResponse {
 
     public static DocenteResponse toResponseWithMasterTable(
             DocenteEntity entity,
-            TablaMaestraCache cache
+            TablaMaestraCache cache,
+            UbigeoCache ubigeoCache
     ) {
         String fotoUrl = null;
 
@@ -137,20 +139,12 @@ public class DocenteResponse {
 
         return DocenteResponse.builder()
                 .docenteId(entity.getDocenteId())
-                .codTipoDocumento(TablaMaestraResponse.buildTablaMaestra(
-                        cache.TIPO_DOCUMENTO_IDENTIDAD,
-                        entity.getCodTipoDocumento(),
-                        cache
+                .codTipoDocumento(TablaMaestraResponse.toResponse.apply(cache.getItem(entity.getCodTipoDocumento())))
+                .codGenero(TablaMaestraResponse.toResponse.apply(
+                        cache.getItem(entity.getCodGenero())
                 ))
-                .codGenero(TablaMaestraResponse.buildTablaMaestra(
-                        cache.GENERO,
-                        entity.getCodGenero(),
-                        cache
-                ))
-                .codEstadoCivil(TablaMaestraResponse.buildTablaMaestra(
-                        cache.ESTADO_CIVIL,
-                        entity.getCodEstadoCivil(),
-                        cache
+                .codEstadoCivil(TablaMaestraResponse.toResponse.apply(
+                        cache.getItem(entity.getCodEstadoCivil())
                 ))
                 .numDocumento(entity.getNumDocumento())
                 .nombre(entity.getNombre())
@@ -160,12 +154,8 @@ public class DocenteResponse {
                 .emailPersonal(entity.getEmailPersonal())
                 .emailInstitucional(entity.getEmailInstitucional())
                 .direccion(entity.getDireccion())
-                .codUbigeoActual(UbigeoResponse.builder()
-                        .codigoUbigeo(entity.getCodigoUbigeoActual())
-                        .build())
-                .codUbigeoProcedencia(UbigeoResponse.builder()
-                        .codigoUbigeo(entity.getCodUbigeoProcedencia())
-                        .build())
+                .codUbigeoActual(UbigeoResponse.toResponse.apply(ubigeoCache.getDistrito(entity.getCodigoUbigeoActual())))
+                .codUbigeoProcedencia(UbigeoResponse.toResponse.apply(ubigeoCache.getDistrito(entity.getCodUbigeoProcedencia())))
                 .telefono(entity.getTelefono())
                 .fotografia(entity.getFotografia())
                 .urlFotografia(fotoUrl)

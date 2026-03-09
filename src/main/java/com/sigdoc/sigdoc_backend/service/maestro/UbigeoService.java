@@ -7,6 +7,6 @@ import java.util.List;
 public interface UbigeoService {
     List<UbigeoResponse> getDepartamentos();
     List<UbigeoResponse> getProvincias(String codeDepartamento);
-    List<UbigeoResponse> getDistritos(String codeDepatarmento, String codeProvincia);
+    List<UbigeoResponse> getDistritos(String codeProvincia);
     UbigeoResponse getUbigeo(String code);
 }
