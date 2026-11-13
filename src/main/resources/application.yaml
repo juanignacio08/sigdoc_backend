@@ -7,6 +7,9 @@ spring:
     name: sigdoc_backend
   main:
     allow-bean-definition-overriding: true
+  web:
+    resources:
+      static-locations: file:uploads/
   datasource:
     url: jdbc:postgresql://localhost:5432/sigdoc
     username: postgres
@@ -26,3 +29,7 @@ spring:
     #        org.hibernate.SQL: DEBUG #INFO
     #        org.hibernate.type.descriptor.sql.BasicBinder: INFO #TRACE
     #org.hibernate.orm.jdbc.bind: TRACE
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
